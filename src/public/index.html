@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EIRL.PE - Crea tu dominio empresarial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            color: #764ba2;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Progress Stepper */
+        .progress-stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .progress-stepper::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .step.completed .step-circle {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .step.active .step-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Flujo Steps */
+        .step-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Step 1: Búsqueda de dominio */
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn, .btn {
+            padding: 16px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .search-btn:hover, .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn:active, .btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.available {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .result.available .result-title {
+            color: #4caf50;
+        }
+
+        .result.available .result-text {
+            color: #2e7d32;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .result-domain {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        /* Step 2: Selección de Templates */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .template-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: #f9f9f9;
+        }
+
+        .template-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .template-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .template-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .template-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .template-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Step 3: Configuración de Estilo */
+        .color-picker-group, .theme-group {
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .color-picker-group label, .theme-group label, .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 3px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .theme-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .theme-btn:hover {
+            border-color: #667eea;
+        }
+
+        .theme-btn.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        /* Step 4: Título de empresa */
+        .form-group {
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Step 5: Formulario de registro */
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .error {
+            color: #f44336;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .buttons-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .templates-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-stepper {
+                margin-bottom: 25px;
+            }
+
+            .step-label {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">eirl<span>.pe</span></div>
+        <h1 id="stepTitle">Encuentra con IA el nombre ideal de tu dominio</h1>
+        <p class="subtitle" id="stepSubtitle">Busca si tu dominio está disponible y comienza tu presencia digital ahora</p>
+
+        <!-- Progress Stepper -->
+        <div class="progress-stepper">
+            <div class="step active" id="step1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Dominio</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Template</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Estilo</div>
+            </div>
+            <div class="step" id="step4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Empresa</div>
+            </div>
+            <div class="step" id="step5">
+                <div class="step-circle">5</div>
+                <div class="step-label">Registro</div>
+            </div>
+        </div>
+
+        <!-- STEP 1: Búsqueda de Dominio -->
+        <div class="step-content active" id="content1">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="hostnameInput" 
+                    placeholder="ej: miempresa, startup, etc..."
+                    autocomplete="off"
+                >
+                <button class="search-btn" onclick="checkHostname()">Buscar</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Buscando disponibilidad...</p>
+            </div>
+
+            <div class="result" id="result">
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-domain" id="resultDomain"></div>
+                <p class="result-text" id="resultText"></p>
+            </div>
+
+            <div class="error" id="error"></div>
+        </div>
+
+        <!-- STEP 2: Selección de Template -->
+        <div class="step-content" id="content2">
+            <p style="margin-bottom: 20px; color: #666;">Selecciona un template para tu sitio</p>
+            <div class="templates-grid">
+                <div class="template-card" onclick="selectTemplate('minimal')">
+                    <div class="template-icon">📱</div>
+                    <div class="template-name">Minimal</div>
+                    <div class="template-desc">Diseño limpio y profesional</div>
+                </div>
+                <div class="template-card" onclick="selectTemplate('creative')">
+                    <div class="template-icon">🎨</div>
+                    <div class="template-name">Creative</div>
+                    <div class="template-desc">Colorido y moderno</div>
+                </div>
+                <div class="template-card" onclick="selectTemplate('corporate')">
+                    <div class="template-icon">💼</div>
+                    <div class="template-name">Corporate</div>
+                    <div class="template-desc">Empresarial y serio</div>
+                </div>
+                <div class="template-card" onclick="selectTemplate('ecommerce')">
+                    <div class="template-icon">🛍️</div>
+                    <div class="template-name">E-commerce</div>
+                    <div class="template-desc">Tienda online optimizada</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Configuración de Estilo -->
+        <div class="step-content" id="content3">
+            <div class="color-picker-group">
+                <label>Color Principal</label>
+                <div class="color-picker">
+                    <div class="color-option" style="background: #667eea;" onclick="selectColor('#667eea')" title="Azul"></div>
+                    <div class="color-option" style="background: #764ba2;" onclick="selectColor('#764ba2')" title="Púrpura"></div>
+                    <div class="color-option" style="background: #f093fb;" onclick="selectColor('#f093fb')" title="Rosa"></div>
+                    <div class="color-option" style="background: #4facfe;" onclick="selectColor('#4facfe')" title="Celeste"></div>
+                    <div class="color-option" style="background: #00f2fe;" onclick="selectColor('#00f2fe')" title="Turquesa"></div>
+                    <div class="color-option" style="background: #43e97b;" onclick="selectColor('#43e97b')" title="Verde"></div>
+                </div>
+            </div>
+
+            <div class="theme-group">
+                <label>Tema</label>
+                <div class="theme-options">
+                    <button class="theme-btn" onclick="selectTheme('light')">☀️ Light</button>
+                    <button class="theme-btn" onclick="selectTheme('dark')">🌙 Dark</button>
+                    <button class="theme-btn" onclick="selectTheme('both')">🔄 Both</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Datos de Empresa -->
+        <div class="step-content" id="content4">
+            <div class="form-group">
+                <label for="companyName">Nombre de la Empresa</label>
+                <input 
+                    type="text" 
+                    id="companyName" 
+                    placeholder="ej: Mi Empresa Increíble S.A.C."
+                >
+            </div>
+            <div class="form-group">
+                <label for="companyDescription">Descripción (opcional)</label>
+                <textarea 
+                    id="companyDescription" 
+                    placeholder="Cuéntanos sobre tu empresa..."
+                    rows="3"
+                ></textarea>
+            </div>
+        </div>
+
+        <!-- STEP 5: Formulario de Registro -->
+        <div class="step-content" id="content5">
+            <div class="success-message" id="successMessage">
+                <p>✓ ¡Exito! Tu sitio web ha sido creado correctamente</p>
+            </div>
+
+            <form class="registration-form" id="registrationForm" onsubmit="submitRegistration(event)">
+                <div class="form-group">
+                    <label for="userName">Nombre Completo</label>
+                    <input 
+                        type="text" 
+                        id="userName" 
+                        placeholder="Tu nombre completo"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input 
+                        type="email" 
+                        id="userEmail" 
+                        placeholder="tu@email.com"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="userPassword" 
+                        placeholder="Contraseña segura"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="userPhone">Teléfono</label>
+                    <input 
+                        type="tel" 
+                        id="userPhone" 
+                        placeholder="+51 999 999 999"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="userDocument">DNI</label>
+                    <input 
+                        type="text" 
+                        id="userDocument" 
+                        placeholder="12345678"
+                    >
+                </div>
+            </form>
+
+            <div class="error" id="registerError"></div>
+            <div class="loading" id="registerLoading">
+                <div class="spinner"></div>
+                <p>Registrando tu cuenta...</p>
+            </div>
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="buttons-group">
+            <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">← Atrás</button>
+            <button class="btn" id="nextBtn" onclick="nextStep()">Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/hostnames';
+        let currentStep = 1;
+        const totalSteps = 5;
+        
+        // Estado del formulario
+        let formData = {
+            hostname: '',
+            template: '',
+            color: '#667eea',
+            theme: 'light',
+            companyName: '',
+            companyDescription: '',
+            userName: '',
+            userEmail: '',
+            userPassword: '',
+            userPhone: '',
+            userDocument: ''
+        };
+
+        // Inicializar
+        document.getElementById('hostnameInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkHostname();
+            }
+        });
+
+        // PASO 1: Búsqueda de Dominio
+        async function checkHostname() {
+            const hostname = document.getElementById('hostnameInput').value.trim();
+            
+            if (!hostname) {
+                showError('Por favor ingresa un nombre');
+                return;
+            }
+
+            if (hostname.length < 3) {
+                showError('El nombre debe tener al menos 3 caracteres');
+                return;
+            }
+
+            formData.hostname = hostname;
+            showLoading(true);
+            hideError();
+            hideResult();
+
+            try {
+                const response = await fetch(`${API_URL}/check/${hostname}`);
+                const data = await response.json();
+                
+                showLoading(false);
+                
+                if (data.available) {
+                    displayResult(data);
+                    // Permitir avanzar solo si el dominio está disponible
+                    document.getElementById('nextBtn').style.display = 'inline-block';
+                } else {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.className = 'result show';
+                    document.getElementById('resultTitle').textContent = '✗ No disponible';
+                    document.getElementById('resultDomain').textContent = `${data.hostname}.eirl.pe`;
+                    document.getElementById('resultText').textContent = 'Lamentablemente este dominio ya está registrado. Prueba otro nombre.';
+                    document.getElementById('nextBtn').style.display = 'none';
+                }
+            } catch (error) {
+                showLoading(false);
+                showError('Error al verificar disponibilidad. Intenta de nuevo.');
+                console.error(error);
+            }
+        }
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDomain = document.getElementById('resultDomain');
+            const resultText = document.getElementById('resultText');
+
+            resultDiv.className = 'result show available';
+            resultTitle.textContent = '✓ ¡Disponible!';
+            resultDomain.textContent = `${data.hostname}.eirl.pe`;
+            resultText.textContent = 'Perfecto, el dominio está libre. Ahora comienza con la creación de tu página web eirl.';
+
+            resultDiv.style.display = 'block';
+        }
+
+        // PASO 2: Selección de Template
+        function selectTemplate(template) {
+            formData.template = template;
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.template-card').classList.add('selected');
+        }
+
+        // PASO 3: Configuración de Estilo
+        function selectColor(color) {
+            formData.color = color;
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function selectTheme(theme) {
+            formData.theme = theme;
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        // PASO 4: Datos de Empresa
+        function saveCompanyData() {
+            formData.companyName = document.getElementById('companyName').value;
+            formData.companyDescription = document.getElementById('companyDescription').value;
+        }
+
+        // PASO 5: Registro
+        async function submitRegistration(e) {
+            e.preventDefault();
+            
+            formData.userName = document.getElementById('userName').value;
+            formData.userEmail = document.getElementById('userEmail').value;
+            formData.userPassword = document.getElementById('userPassword').value;
+            formData.userPhone = document.getElementById('userPhone').value;
+            formData.userDocument = document.getElementById('userDocument').value;
+
+            showRegisterLoading(true);
+            hideRegisterError();
+
+            try {
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: formData.userEmail,
+                        password: formData.userPassword,
+                        name: formData.userName,
+                        userProfile: {
+                            document: formData.userDocument,
+                            phone: formData.userPhone,
+                            company_name: formData.companyName,
+                            hostname_id: formData.hostname
+                        }
+                    }),
+                });
+
+                showRegisterLoading(false);
+
+                if (response.ok) {
+                    document.getElementById('successMessage').classList.add('show');
+                    document.getElementById('registrationForm').style.display = 'none';
+                    document.getElementById('nextBtn').style.display = 'none';
+                    document.getElementById('prevBtn').style.display = 'none';
+                } else {
+                    showRegisterError('Error al registrar. Intenta de nuevo.');
+                }
+            } catch (error) {
+                showRegisterLoading(false);
+                showRegisterError('Error en la conexión. Intenta de nuevo.');
+                console.error(error);
+            }
+        }
+
+        // Navegación entre pasos
+        function goToStep(step) {
+            // Validación antes de avanzar
+            if (currentStep === 1) {
+                if (!formData.hostname) {
+                    showError('Por favor selecciona un dominio disponible');
+                    return;
+                }
+            }
+            if (currentStep === 2) {
+                if (!formData.template) {
+                    showError('Por favor selecciona un template');
+                    return;
+                }
+            }
+            if (currentStep === 4) {
+                saveCompanyData();
+            }
+            if (currentStep === 5) {
+                return; // No permitir ir más allá del paso 5
+            }
+
+            // Ocultar paso actual
+            document.getElementById(`content${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            if (currentStep !== 1) {
+                document.getElementById(`step${currentStep}`).classList.add('completed');
+            }
+
+            // Mostrar nuevo paso
+            currentStep = step;
+            document.getElementById(`content${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}`).classList.remove('completed');
+
+            // Actualizar títulos
+            const titles = {
+                1: 'Encuentra con IA el nombre ideal de tu dominio',
+                2: 'Selecciona tu template favorito',
+                3: 'Personaliza el estilo de tu sitio',
+                4: 'Información de tu empresa',
+                5: 'Completa tu registro'
+            };
+            document.getElementById('stepTitle').textContent = titles[currentStep];
+
+            // Actualizar botones
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'inline-block';
+            document.getElementById('nextBtn').textContent = currentStep === 5 ? 'Registrarse' : 'Siguiente →';
+            document.getElementById('nextBtn').onclick = currentStep === 5 ? () => document.getElementById('registrationForm').dispatchEvent(new Event('submit')) : nextStep;
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                goToStep(currentStep + 1);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        }
+
+        // Utilidades
+        function showLoading(show) {
+            document.getElementById('loading').className = show ? 'loading show' : 'loading';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'error show';
+        }
+
+        function hideError() {
+            document.getElementById('error').className = 'error';
+        }
+
+        function hideResult() {
+            document.getElementById('result').className = 'result';
+        }
+
+        function showRegisterLoading(show) {
+            document.getElementById('registerLoading').className = show ? 'loading show' : 'loading';
+        }
+
+        function showRegisterError(message) {
+            const errorDiv = document.getElementById('registerError');
+            errorDiv.textContent = message;
+            errorDiv.className = 'error show';
+        }
+
+        function hideRegisterError() {
+            document.getElementById('registerError').className = 'error';
+        }
+    </script>
+</body>
+</html>

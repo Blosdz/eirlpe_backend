@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - EIRL.PE</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#2ecc71',
+                        'secondary': '#8e44ad',
+                        'accent': '#95DCE4',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gradient-to-b from-primary to-green-600 text-white shadow-lg">
+            <div class="p-6">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold">EIRL.PE</h1>
+                    <p class="text-green-100 text-sm mt-2">Tu Socio Digital</p>
+                </div>
+
+                <!-- User Info -->
+                <div class="bg-white bg-opacity-10 backdrop-blur rounded-lg p-4 mb-8">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <span class="text-lg font-bold">👤</span>
+                        </div>
+                        <div>
+                            <p class="text-sm opacity-75">Usuario</p>
+                            <p id="userNameDisplay" class="font-bold text-lg">Cargando...</p>
+                        </div>
+                    </div>
+                    <p id="userEmailDisplay" class="text-sm text-green-100">Email: --</p>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="#" onclick="showSection('domains')" class="block px-4 py-3 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition font-semibold">
+                        📊 Mis Dominios
+                    </a>
+                    <a href="#" onclick="showSection('settings')" class="block px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition">
+                        ⚙️ Configuración
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="absolute bottom-0 w-64 p-6 border-t border-white border-opacity-20">
+                <button onclick="logout()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm sticky top-0 z-10">
+                <div class="px-8 py-4">
+                    <h2 id="sectionTitle" class="text-2xl font-bold text-gray-900">Mis Dominios</h2>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="p-8">
+                <!-- Domains Section -->
+                <section id="domainsSection" class="block">
+                    <div class="mb-6 flex justify-between items-center">
+                        <p class="text-gray-600">Gestiona tus dominios y servicios</p>
+                        <a href="/" class="bg-primary text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 transition">
+                            + Nuevo Dominio
+                        </a>
+                    </div>
+
+                    <!-- Domains Table -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Dominio</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Tema</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Estado</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Fecha de Creación</th>
+                                    <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="domainsTableBody">
+                                <tr class="border-b border-gray-200">
+                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                        <div class="flex items-center justify-center">
+                                            <div class="animate-spin h-6 w-6 text-primary mr-2"></div>
+                                            Cargando dominios...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settingsSection" class="hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6">Configuración de Cuenta</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo</label>
+                                <input type="text" id="settingsName" class="w-full px-4 py-2 border border-gray-300 rounded-lg" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                                <input type="email" id="settingsEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
+                                <input type="tel" id="settingsPhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Empresa</label>
+                                <input type="text" id="settingsCompany" class="w-full px-4 py-2 border border-gray-300 rounded-lg" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Realizar Pago</h3>
+                <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <p class="text-sm text-gray-600 mb-1">Dominio</p>
+                <p id="paymentDomain" class="text-xl font-bold text-primary">example.eirl.pe</p>
+            </div>
+
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+                <p class="text-sm text-gray-600 mb-1">Monto a Pagar</p>
+                <p class="text-3xl font-bold text-blue-600">S/ 80.00</p>
+                <p class="text-xs text-gray-500 mt-2">Precio anual del dominio</p>
+            </div>
+
+            <button onclick="processPayment()" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-green-700 transition mb-3">
+                Proceder al Pago con Culqi
+            </button>
+
+            <button onclick="closePaymentModal()" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition">
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <script src="https://js.culqi.com/checkout-js"></script>
+    <script>
+        const AUTH_URL = '/auth';
+        const PAYMENTS_URL = '/payments';
+
+        let currentUser = null;
+        let currentPaymentHostname = null;
+        let currentPaymentHostnameId = null;
+        let publicKey = null;
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    loadDashboard();
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    redirectToHome();
+                }
+            } else {
+                redirectToHome();
+            }
+        });
+
+        function loadDashboard() {
+            if (!currentUser) {
+                redirectToHome();
+                return;
+            }
+
+            // Display user info
+            document.getElementById('userNameDisplay').textContent = currentUser.name || currentUser.email.split('@')[0];
+            document.getElementById('userEmailDisplay').textContent = `Email: ${currentUser.email}`;
+            document.getElementById('settingsName').value = currentUser.name || '';
+            document.getElementById('settingsEmail').value = currentUser.email || '';
+            
+            // Handle user profile info
+            if (currentUser.userProfile) {
+                document.getElementById('settingsPhone').value = currentUser.userProfile.phone || '';
+                document.getElementById('settingsCompany').value = currentUser.userProfile.company_name || '';
+            }
+
+            loadDomains();
+        }
+
+        async function loadDomains() {
+            try {
+                const response = await fetch(`${AUTH_URL}/hostnames/${currentUser.id}`);
+                if (!response.ok) {
+                    throw new Error('Error al cargar dominios');
+                }
+
+                const hostnames = await response.json();
+                const tableBody = document.getElementById('domainsTableBody');
+                tableBody.innerHTML = '';
+
+                if (hostnames.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr class="border-b border-gray-200">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                <p class="text-lg font-semibold mb-2">No tienes dominios aún</p>
+                                <p class="text-sm">Crea tu primer dominio para comenzar</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                hostnames.forEach(hostname => {
+                    const createdDate = new Date(hostname.created_at).toLocaleDateString('es-PE');
+                    const status = 'Activo'; // Status por defecto
+                    const theme = hostname.company_name ? 'Personalizado' : 'Por definir';
+
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-200 hover:bg-gray-50 transition';
+                    row.innerHTML = `
+                        <td class="px-6 py-4">
+                            <a href="https://${hostname.hostname}.eirl.pe" target="_blank" class="font-bold text-primary hover:text-green-700 transition">
+                                ${hostname.hostname}.eirl.pe
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            ${theme}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                ✓ ${status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            ${createdDate}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex gap-2 justify-end">
+                                <button onclick="editDomain(${hostname.id}, '${hostname.hostname}')" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition">
+                                    ✏️ Editar
+                                </button>
+                                <button onclick="openPaymentModal('${hostname.hostname}', ${hostname.id})" class="bg-primary hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition">
+                                    💳 Pagar
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading domains:', error);
+                const tableBody = document.getElementById('domainsTableBody');
+                tableBody.innerHTML = `
+                    <tr class="border-b border-gray-200">
+                        <td colspan="5" class="px-6 py-8 text-center text-red-600">
+                            <p class="font-semibold">Error al cargar dominios</p>
+                            <p class="text-sm mt-2">${error.message}</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.getElementById('domainsSection').classList.add('hidden');
+            document.getElementById('settingsSection').classList.add('hidden');
+
+            // Show selected section
+            if (section === 'domains') {
+                document.getElementById('domainsSection').classList.remove('hidden');
+                document.getElementById('sectionTitle').textContent = 'Mis Dominios';
+            } else if (section === 'settings') {
+                document.getElementById('settingsSection').classList.remove('hidden');
+                document.getElementById('sectionTitle').textContent = 'Configuración';
+            }
+
+            // Update active menu item
+            document.querySelectorAll('aside a').forEach(link => {
+                link.classList.remove('bg-opacity-30');
+                link.classList.add('hover:bg-opacity-10');
+            });
+            event.currentTarget.classList.add('bg-opacity-30');
+            event.currentTarget.classList.remove('hover:bg-opacity-10');
+        }
+
+        function openPaymentModal(hostname, hostnameId) {
+            currentPaymentHostname = hostname;
+            currentPaymentHostnameId = hostnameId;
+            document.getElementById('paymentDomain').textContent = `${hostname}.eirl.pe`;
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            currentPaymentHostname = null;
+            currentPaymentHostnameId = null;
+        }
+
+        function processPayment() {
+            if (!currentUser || !currentPaymentHostname) {
+                alert('Error: Faltan datos del usuario o dominio');
+                return;
+            }
+
+            // Configuración de Culqi
+            const settings = {
+                title: 'Culqi store 2',
+                currency: 'PEN',
+                amount: 8000,
+                order: 'ord_live_d1P0Tu1n7Od4nZdp',
+                xculqirsaid: 'Inserta aquí el id de tu llave pública RSA',
+                rsapublickey: 'Inserta aquí tu llave pública RSA',
+            };
+
+            const paymentMethods = {
+                tarjeta: true,
+                yape: true,
+                billetera: true,
+                bancaMovil: true,
+                agente: true,
+                cuotealo: true,	
+            };
+
+            const options = {
+                lang: 'auto',
+                installments: true,
+                modal: true,
+                container: "#culqi-container",
+                paymentMethods: paymentMethods,
+                paymentMethodsSort: Object.keys(paymentMethods),
+            };
+
+            const client = {
+                email: currentUser.email,
+            };
+
+            const appearance = {
+                theme: "default",
+                hiddenCulqiLogo: false,
+                hiddenBannerContent: false,
+                hiddenBanner: false,
+                hiddenToolBarAmount: false,
+                menuType: "sidebar",
+                buttonCardPayText: "Pagar S/ 80.00",
+            };
+
+            const config = {
+                settings,
+                client,
+                options,
+                appearance,
+            };
+
+            const handleCulqiAction = () => {
+                if (Culqi.token) {
+                    const token = Culqi.token.id;
+                    console.log('Se ha creado un Token: ', token);
+                    processTokenPayment(token);
+                } else if (Culqi.order) {
+                    const order = Culqi.order;
+                    console.log('Se ha creado el objeto Order: ', order);
+                    alert('Orden creada exitosamente: ' + order.id);
+                } else {
+                    console.log('Error: ', Culqi.error);
+                    alert('Error en el pago: ' + JSON.stringify(Culqi.error));
+                }
+            };
+
+            if (typeof CulqiCheckout === 'undefined') {
+                console.error('CulqiCheckout no está disponible');
+                alert('Error: El script de Culqi no se cargó correctamente. Por favor recarga la página.');
+                return;
+            }
+
+            try {
+                const Culqi = new CulqiCheckout(publicKey, config);
+                Culqi.culqi = handleCulqiAction;
+                Culqi.open();
+                closePaymentModal();
+            } catch (error) {
+                console.error('Error al crear Culqi Checkout:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function processTokenPayment(token) {
+            try {
+                console.log('Enviando token al servidor para procesar pago...', token);
+                
+                const paymentData = {
+                    token_id: token,
+                    hostname: currentPaymentHostname,
+                    user_id: currentUser.id,
+                    amount: 8000,
+                    currency: 'PEN',
+                    description: `Renovación de dominio ${currentPaymentHostname}.eirl.pe`,
+                };
+
+                const response = await fetch('/payments/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(paymentData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Pago procesado exitosamente. Tu dominio ha sido renovado.');
+                    loadDomains();
+                } else {
+                    alert('Error al procesar el pago: ' + (data.message || JSON.stringify(data)));
+                }
+            } catch (error) {
+                console.error('Error al procesar el pago:', error);
+                alert('Error de conexión: ' + error.message);
+            }
+        }
+
+        function editDomain(hostnameId, hostname) {
+            alert(`Editar dominio: ${hostname}`);
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('user');
+            redirectToHome();
+        }
+
+        function redirectToHome() {
+            window.location.href = '/pages/index.html';
+        }
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

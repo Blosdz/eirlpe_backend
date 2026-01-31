@@ -1,0 +1,26 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HostnamesModule = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const hostname_entity_1 = require("../entities/hostname.entity");
+const hostnames_service_1 = require("./hostnames.service");
+const hostnames_controller_1 = require("./hostnames.controller");
+let HostnamesModule = class HostnamesModule {
+};
+exports.HostnamesModule = HostnamesModule;
+exports.HostnamesModule = HostnamesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([hostname_entity_1.Hostname])],
+        controllers: [hostnames_controller_1.HostnamesController],
+        providers: [hostnames_service_1.HostnamesService],
+        exports: [hostnames_service_1.HostnamesService],
+    })
+], HostnamesModule);
+//# sourceMappingURL=hostnames.module.js.map
