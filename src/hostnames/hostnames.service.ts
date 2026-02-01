@@ -1,130 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Hostname } from '../entities/hostname.entity';
+import { Hostname } from '../entities';
 
 @Injectable()
 export class HostnamesService {
   constructor(
     @InjectRepository(Hostname)
-    private hostnamesRepository: Repository<Hostname>,
+    private hostnameRepository: Repository<Hostname>,
   ) {}
 
-  /**
-   * Check if a hostname is available
-   */
-  async checkAvailability(hostname: string): Promise<{
-    available: boolean;
-    hostname: string;
-  }> {
-    const normalizedHostname = hostname.toLowerCase().trim();
-    
-    const existing = await this.hostnamesRepository.findOne({
-      where: { hostname: normalizedHostname },
+  async findAll(): Promise<Hostname[]> {
+    return this.hostnameRepository.find({
+      order: { createdAt: 'DESC' },
     });
+  }
 
+  async findOne(id: number): Promise<Hostname> {
+    const hostname = await this.hostnameRepository.findOne({ where: { id } });
+    if (!hostname) {
+      throw new NotFoundException(`Hostname con ID ${id} no encontrado`);
+    }
+    return hostname;
+  }
+
+  async findByHostname(hostname: string): Promise<Hostname | null> {
+    return this.hostnameRepository.findOne({ where: { hostname } });
+  }
+
+  async checkAvailability(hostname: string): Promise<{ available: boolean; hostname: string }> {
+    const existing = await this.findByHostname(hostname.toLowerCase());
     return {
       available: !existing,
-      hostname: normalizedHostname,
+      hostname: hostname.toLowerCase(),
     };
   }
 
-  /**
-   * Register a new hostname
-   */
-  async register(hostname: string): Promise<Hostname> {
+  async create(hostname: string): Promise<Hostname> {
     const normalizedHostname = hostname.toLowerCase().trim();
 
-    // Check if already exists
-    const existing = await this.hostnamesRepository.findOne({
-      where: { hostname: normalizedHostname },
-    });
-
+    const existing = await this.findByHostname(normalizedHostname);
     if (existing) {
-      throw new Error('Hostname already taken');
+      throw new BadRequestException('El hostname ya existe');
     }
 
-    const newHostname = this.hostnamesRepository.create({
+    const newHostname = this.hostnameRepository.create({
       hostname: normalizedHostname,
     });
 
-    return this.hostnamesRepository.save(newHostname);
+    return this.hostnameRepository.save(newHostname);
   }
 
-  /**
-   * Get hostname by name
-   */
-  async findByHostname(hostname: string): Promise<Hostname | null> {
-    return this.hostnamesRepository.findOne({
-      where: { hostname: hostname.toLowerCase().trim() },
-      relations: ['userProfiles', 'templateUserPersonalizations'],
-    });
-  }
-
-  /**
-   * Get all hostnames
-   */
-  async findAll(): Promise<Hostname[]> {
-    return this.hostnamesRepository.find({
-      relations: ['userProfiles', 'templateUserPersonalizations'],
-    });
-  }
-
-  /**
-   * Get hostname by ID
-   */
-  async findById(id: number): Promise<Hostname | null> {
-    return this.hostnamesRepository.findOne({
-      where: { id },
-      relations: ['userProfiles', 'templateUserPersonalizations'],
-    });
-  }
-
-  /**
-   * Update hostname
-   */
-  async update(id: number, hostname: string): Promise<Hostname | null> {
-    const normalizedHostname = hostname.toLowerCase().trim();
-
-    // Check if new hostname already exists
-    const existing = await this.hostnamesRepository.findOne({
-      where: { hostname: normalizedHostname },
-    });
-
-    if (existing && existing.id !== id) {
-      throw new Error('Hostname already taken');
-    }
-
-    await this.hostnamesRepository.update(id, { hostname: normalizedHostname });
-    return this.findById(id);
-  }
-
-  /**
-   * Delete hostname
-   */
-  async delete(id: number): Promise<void> {
-    await this.hostnamesRepository.delete(id);
-  }
-
-  /**
-   * Register hostname with user association (for multi-tenant)
-   */
   async registerWithUser(hostname: string, userId: number): Promise<Hostname> {
     const normalizedHostname = hostname.toLowerCase().trim();
 
-    // Check if already exists
-    const existing = await this.hostnamesRepository.findOne({
-      where: { hostname: normalizedHostname },
-    });
-
-    if (existing) {
-      throw new Error('Hostname already taken');
+    let existingHostname = await this.findByHostname(normalizedHostname);
+    if (existingHostname) {
+      throw new BadRequestException('El hostname ya está en uso');
     }
 
-    const newHostname = this.hostnamesRepository.create({
+    const newHostname = this.hostnameRepository.create({
       hostname: normalizedHostname,
     });
 
-    return this.hostnamesRepository.save(newHostname);
+    return this.hostnameRepository.save(newHostname);
+  }
+
+  async remove(id: number): Promise<void> {
+    const hostname = await this.findOne(id);
+    await this.hostnameRepository.remove(hostname);
   }
 }

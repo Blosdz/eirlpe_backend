@@ -1,26 +1,32 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { DatabaseModule } from '../database/database.module';
 import { HostnamesModule } from '../hostnames/hostnames.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { User, UserProfile } from '../entities';
 
 @Module({
   imports: [
-    DatabaseModule,
+    TypeOrmModule.forFeature([User, UserProfile]),
     HostnamesModule,
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'eirl-pe-secret-key-2026-change-in-production',
-      signOptions: {
-        expiresIn: '24h',
-      },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET') || 'eirl-pe-secret-key-2026-change-in-production',
+        signOptions: {
+          expiresIn: configService.get('JWT_EXPIRES_IN') || '24h',
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

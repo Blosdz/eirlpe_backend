@@ -1,7 +1,7 @@
 import { IsEmail, IsString, IsNotEmpty, MinLength, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class UserProfileDto {
+export class UserProfileDto {
   @IsOptional()
   @IsString()
   document?: string;
@@ -13,6 +13,14 @@ class UserProfileDto {
   @IsOptional()
   @IsString()
   company_name?: string;
+
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @IsNotEmpty({ message: 'El RUC de la empresa es requerido' })
+  @IsString()
+  ruc_company: string;
 
   @IsNotEmpty({ message: 'El hostname es requerido' })
   @IsString()

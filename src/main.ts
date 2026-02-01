@@ -1,17 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
-import { join } from 'path';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
-
-// Load environment variables from .env file
-dotenv.config();
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
 
-  // Enable global validation pipe
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -20,18 +19,10 @@ async function bootstrap() {
     }),
   );
 
-  // Serve static files from public folder
-  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setGlobalPrefix('api');
 
-  // Serve pages from src/pages folder
-  app.useStaticAssets(join(__dirname, 'pages'), {
-    prefix: '/pages',
-  });
-
-  // Enable CORS for development
-  app.enableCors();
-
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3000}`);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`Application running on port ${port}`);
 }
 bootstrap();

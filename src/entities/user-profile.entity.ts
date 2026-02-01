@@ -1,63 +1,48 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Unique,
-  Index,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { User } from './user.entity';
 import { Hostname } from './hostname.entity';
-import { TemplateUserPersonalization } from './template-user-personalization.entity';
 
 @Entity('user_profile')
-@Unique('unique_user_hostname', ['user', 'hostname'])
+@Unique(['user', 'hostname'])
 export class UserProfile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int' })
-  users_id: number;
+  @Column({ name: 'users_id' })
+  usersId: number;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ length: 100, nullable: true })
   document: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ length: 20, nullable: true })
   phone: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  company_name: string;
+  @Column({ name: 'company_name', length: 255, nullable: true })
+  companyName: string;
 
-  @Column({ type: 'int' })
-  hostname_id: number;
+  @Column({ length: 500, nullable: true })
+  address: string;
 
-  @Column({ type: 'int', nullable: true })
-  template_user_id: number;
+  @Column({ name: 'ruc_company', length: 100 })
+  rucCompany: string;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @Column({ name: 'hostname_id' })
+  hostnameId: number;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @Column({ name: 'template_user_id', nullable: true })
+  templateUserId: number;
 
-  @ManyToOne(() => User, (user) => user.userProfiles, { onDelete: 'CASCADE' })
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @ManyToOne(() => User, user => user.userProfiles, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'users_id' })
   user: User;
 
-  @ManyToOne(() => Hostname, (hostname) => hostname.userProfiles, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Hostname, hostname => hostname.userProfiles, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'hostname_id' })
   hostname: Hostname;
-
-  @ManyToOne(
-    () => TemplateUserPersonalization,
-    (templateUserPersonalization) => templateUserPersonalization.userProfiles,
-    { nullable: true, onDelete: 'SET NULL' },
-  )
-  @JoinColumn({ name: 'template_user_id' })
-  templateUserPersonalization: TemplateUserPersonalization;
 }

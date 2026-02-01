@@ -1,7 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User, UserProfile } from '../../entities';
 
 export interface JwtPayload {
   sub: number;
@@ -10,38 +13,34 @@ export interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private dataSource: DataSource) {
+  constructor(
+    private configService: ConfigService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(UserProfile)
+    private userProfileRepository: Repository<UserProfile>,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'eirl-pe-secret-key-2026-change-in-production',
+      secretOrKey: configService.get('JWT_SECRET') || 'eirl-pe-secret-key-2026-change-in-production',
     });
   }
 
   async validate(payload: JwtPayload) {
-    // Verificar que el usuario existe en la base de datos
-    const userResult = await this.dataSource.query(
-      'SELECT id, email FROM users WHERE id = $1',
-      [payload.sub],
-    );
+    const user = await this.userRepository.findOne({
+      where: { id: payload.sub },
+      select: ['id', 'email'],
+    });
 
-    if (userResult.length === 0) {
+    if (!user) {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    const user = userResult[0];
+    const userProfile = await this.userProfileRepository.findOne({
+      where: { usersId: user.id },
+    });
 
-    // Obtener perfil del usuario
-    const profileResult = await this.dataSource.query(
-      `SELECT id, document, phone, company_name, hostname_id
-       FROM user_profile
-       WHERE users_id = $1 LIMIT 1`,
-      [user.id],
-    );
-
-    const userProfile = profileResult.length > 0 ? profileResult[0] : null;
-
-    // Este objeto estará disponible como req.user en los controladores
     return {
       id: user.id,
       email: user.email,

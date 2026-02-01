@@ -1,39 +1,20 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  Unique,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
-import { TemplateUserPersonalization } from '../entities/template-user-personalization.entity';
 
 @Entity('hostnames')
-@Unique(['hostname'])
 export class Hostname {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ unique: true, length: 255 })
   hostname: string;
 
-  @Column({ type: 'int', nullable: true })
-  template_user_personalization: number;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
-
-  @OneToMany(() => UserProfile, (userProfile) => userProfile.hostname)
+  @OneToMany(() => UserProfile, userProfile => userProfile.hostname)
   userProfiles: UserProfile[];
-
-  @OneToMany(
-    () => TemplateUserPersonalization,
-    (templateUserPersonalization) => templateUserPersonalization.hostname,
-  )
-  templateUserPersonalizations: TemplateUserPersonalization[];
 }
