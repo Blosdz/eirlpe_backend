@@ -1,7 +1,9 @@
-declare class UserProfileDto {
+export declare class UserProfileDto {
     document?: string;
     phone?: string;
     company_name?: string;
+    address?: string;
+    ruc_company: string;
     hostname_id: string;
 }
 export declare class CreateUserDto {
@@ -10,4 +12,3 @@ export declare class CreateUserDto {
     name: string;
     userProfile: UserProfileDto;
 }
-export {};

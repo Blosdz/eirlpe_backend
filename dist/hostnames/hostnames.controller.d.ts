@@ -6,19 +6,13 @@ export declare class HostnamesController {
         available: boolean;
         hostname: string;
     }>;
-    register(body: {
-        hostname: string;
-    }): Promise<import("../entities").Hostname>;
-    registerWithUser(body: {
-        hostname: string;
-        userId: number;
-    }): Promise<import("../entities").Hostname>;
     findAll(): Promise<import("../entities").Hostname[]>;
-    findById(id: number): Promise<import("../entities").Hostname | null>;
-    update(id: number, body: {
+    findOne(id: number): Promise<import("../entities").Hostname>;
+    create(body: {
         hostname: string;
-    }): Promise<import("../entities").Hostname | null>;
-    delete(id: number): Promise<{
+    }): Promise<import("../entities").Hostname>;
+    remove(id: number): Promise<{
+        success: boolean;
         message: string;
     }>;
 }

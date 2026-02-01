@@ -9,15 +9,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUserDto = void 0;
+exports.CreateUserDto = exports.UserProfileDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 class UserProfileDto {
     document;
     phone;
     company_name;
+    address;
+    ruc_company;
     hostname_id;
 }
+exports.UserProfileDto = UserProfileDto;
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
@@ -33,6 +36,16 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UserProfileDto.prototype, "company_name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UserProfileDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)({ message: 'El RUC de la empresa es requerido' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UserProfileDto.prototype, "ruc_company", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'El hostname es requerido' }),
     (0, class_validator_1.IsString)(),

@@ -1,5 +1,7 @@
+import { ConfigService } from '@nestjs/config';
 import { Strategy } from 'passport-jwt';
-import { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
+import { User, UserProfile } from '../../entities';
 export interface JwtPayload {
     sub: number;
     email: string;
@@ -8,12 +10,14 @@ declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").Strat
     validate(...args: any[]): unknown;
 };
 export declare class JwtStrategy extends JwtStrategy_base {
-    private dataSource;
-    constructor(dataSource: DataSource);
+    private configService;
+    private userRepository;
+    private userProfileRepository;
+    constructor(configService: ConfigService, userRepository: Repository<User>, userProfileRepository: Repository<UserProfile>);
     validate(payload: JwtPayload): Promise<{
-        id: any;
-        email: any;
-        userProfile: any;
+        id: number;
+        email: string;
+        userProfile: UserProfile | null;
     }>;
 }
 export {};

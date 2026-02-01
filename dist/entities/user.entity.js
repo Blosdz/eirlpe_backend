@@ -12,17 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const user_profile_entity_1 = require("./user-profile.entity");
-const cobro_entity_1 = require("../entities/cobro.entity");
-const template_user_personalization_entity_1 = require("./template-user-personalization.entity");
+const available_entity_1 = require("./available.entity");
 let User = class User {
     id;
     email;
     password;
-    created_at;
-    updated_at;
+    createdAt;
+    updatedAt;
     userProfiles;
-    cobros;
-    templateUserPersonalizations;
+    availables;
 };
 exports.User = User;
 __decorate([
@@ -30,35 +28,30 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255 }),
+    (0, typeorm_1.Column)({ unique: true, length: 255 }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255 }),
+    (0, typeorm_1.Column)({ length: 255 }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)
-], User.prototype, "created_at", void 0);
+], User.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
     __metadata("design:type", Date)
-], User.prototype, "updated_at", void 0);
+], User.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => user_profile_entity_1.UserProfile, (userProfile) => userProfile.user),
+    (0, typeorm_1.OneToMany)(() => user_profile_entity_1.UserProfile, userProfile => userProfile.user),
     __metadata("design:type", Array)
 ], User.prototype, "userProfiles", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => cobro_entity_1.Cobro, (cobro) => cobro.user),
+    (0, typeorm_1.OneToMany)(() => available_entity_1.Available, available => available.user),
     __metadata("design:type", Array)
-], User.prototype, "cobros", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => template_user_personalization_entity_1.TemplateUserPersonalization, (templateUserPersonalization) => templateUserPersonalization.user),
-    __metadata("design:type", Array)
-], User.prototype, "templateUserPersonalizations", void 0);
+], User.prototype, "availables", void 0);
 exports.User = User = __decorate([
-    (0, typeorm_1.Entity)('users'),
-    (0, typeorm_1.Unique)(['email'])
+    (0, typeorm_1.Entity)('users')
 ], User);
 //# sourceMappingURL=user.entity.js.map

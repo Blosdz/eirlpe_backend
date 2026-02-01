@@ -11,17 +11,17 @@ export class UserProfile {
   @Column({ name: 'users_id' })
   usersId: number;
 
-  @Column({ length: 100, nullable: true })
-  document: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  document?: string;
 
-  @Column({ length: 20, nullable: true })
-  phone: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phone?: string;
 
-  @Column({ name: 'company_name', length: 255, nullable: true })
-  companyName: string;
+  @Column({ type: 'varchar', name: 'company_name', length: 255, nullable: true })
+  companyName?: string;
 
-  @Column({ length: 500, nullable: true })
-  address: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  address?: string;
 
   @Column({ name: 'ruc_company', length: 100 })
   rucCompany: string;

@@ -64,9 +64,9 @@ export class AuthService {
 
     const newProfile = new UserProfile();
     newProfile.usersId = savedUser.id;
-    newProfile.document = userProfile.document || null;
-    newProfile.phone = userProfile.phone || null;
-    newProfile.companyName = userProfile.company_name || null;
+    newProfile.document = userProfile.document;
+    newProfile.phone = userProfile.phone;
+    newProfile.companyName = userProfile.company_name;
     newProfile.hostnameId = hostname.id;
     newProfile.rucCompany = userProfile.ruc_company;
     await this.userProfileRepository.save(newProfile);
@@ -83,9 +83,9 @@ export class AuthService {
         email: savedUser.email,
         name: name,
         userProfile: {
-          document: userProfile.document || null,
-          phone: userProfile.phone || null,
-          company_name: userProfile.company_name || null,
+          document: userProfile.document,
+          phone: userProfile.phone,
+          company_name: userProfile.company_name,
           hostname_id: hostname.id,
           hostname: hostname.hostname,
         },

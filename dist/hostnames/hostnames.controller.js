@@ -24,24 +24,18 @@ let HostnamesController = class HostnamesController {
     async checkAvailability(hostname) {
         return this.hostnamesService.checkAvailability(hostname);
     }
-    async register(body) {
-        return this.hostnamesService.register(body.hostname);
-    }
-    async registerWithUser(body) {
-        return this.hostnamesService.registerWithUser(body.hostname, body.userId);
-    }
     async findAll() {
         return this.hostnamesService.findAll();
     }
-    async findById(id) {
-        return this.hostnamesService.findById(id);
+    async findOne(id) {
+        return this.hostnamesService.findOne(id);
     }
-    async update(id, body) {
-        return this.hostnamesService.update(id, body.hostname);
+    async create(body) {
+        return this.hostnamesService.create(body.hostname);
     }
-    async delete(id) {
-        await this.hostnamesService.delete(id);
-        return { message: 'Hostname deleted successfully' };
+    async remove(id) {
+        await this.hostnamesService.remove(id);
+        return { success: true, message: 'Hostname eliminado' };
     }
 };
 exports.HostnamesController = HostnamesController;
@@ -52,21 +46,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], HostnamesController.prototype, "checkAvailability", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], HostnamesController.prototype, "register", null);
-__decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Post)('register-with-user'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], HostnamesController.prototype, "registerWithUser", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(),
@@ -81,16 +60,15 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], HostnamesController.prototype, "findById", null);
+], HostnamesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], HostnamesController.prototype, "update", null);
+], HostnamesController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Delete)(':id'),
@@ -98,7 +76,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], HostnamesController.prototype, "delete", null);
+], HostnamesController.prototype, "remove", null);
 exports.HostnamesController = HostnamesController = __decorate([
     (0, common_1.Controller)('hostnames'),
     __metadata("design:paramtypes", [hostnames_service_1.HostnamesService])

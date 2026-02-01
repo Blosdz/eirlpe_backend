@@ -16,84 +16,65 @@ exports.HostnamesService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const hostname_entity_1 = require("../entities/hostname.entity");
+const entities_1 = require("../entities");
 let HostnamesService = class HostnamesService {
-    hostnamesRepository;
-    constructor(hostnamesRepository) {
-        this.hostnamesRepository = hostnamesRepository;
-    }
-    async checkAvailability(hostname) {
-        const normalizedHostname = hostname.toLowerCase().trim();
-        const existing = await this.hostnamesRepository.findOne({
-            where: { hostname: normalizedHostname },
-        });
-        return {
-            available: !existing,
-            hostname: normalizedHostname,
-        };
-    }
-    async register(hostname) {
-        const normalizedHostname = hostname.toLowerCase().trim();
-        const existing = await this.hostnamesRepository.findOne({
-            where: { hostname: normalizedHostname },
-        });
-        if (existing) {
-            throw new Error('Hostname already taken');
-        }
-        const newHostname = this.hostnamesRepository.create({
-            hostname: normalizedHostname,
-        });
-        return this.hostnamesRepository.save(newHostname);
-    }
-    async findByHostname(hostname) {
-        return this.hostnamesRepository.findOne({
-            where: { hostname: hostname.toLowerCase().trim() },
-            relations: ['userProfiles', 'templateUserPersonalizations'],
-        });
+    hostnameRepository;
+    constructor(hostnameRepository) {
+        this.hostnameRepository = hostnameRepository;
     }
     async findAll() {
-        return this.hostnamesRepository.find({
-            relations: ['userProfiles', 'templateUserPersonalizations'],
+        return this.hostnameRepository.find({
+            order: { createdAt: 'DESC' },
         });
     }
-    async findById(id) {
-        return this.hostnamesRepository.findOne({
-            where: { id },
-            relations: ['userProfiles', 'templateUserPersonalizations'],
-        });
-    }
-    async update(id, hostname) {
-        const normalizedHostname = hostname.toLowerCase().trim();
-        const existing = await this.hostnamesRepository.findOne({
-            where: { hostname: normalizedHostname },
-        });
-        if (existing && existing.id !== id) {
-            throw new Error('Hostname already taken');
+    async findOne(id) {
+        const hostname = await this.hostnameRepository.findOne({ where: { id } });
+        if (!hostname) {
+            throw new common_1.NotFoundException(`Hostname con ID ${id} no encontrado`);
         }
-        await this.hostnamesRepository.update(id, { hostname: normalizedHostname });
-        return this.findById(id);
+        return hostname;
     }
-    async delete(id) {
-        await this.hostnamesRepository.delete(id);
+    async findByHostname(hostname) {
+        return this.hostnameRepository.findOne({ where: { hostname } });
+    }
+    async checkAvailability(hostname) {
+        const existing = await this.findByHostname(hostname.toLowerCase());
+        return {
+            available: !existing,
+            hostname: hostname.toLowerCase(),
+        };
+    }
+    async create(hostname) {
+        const normalizedHostname = hostname.toLowerCase().trim();
+        const existing = await this.findByHostname(normalizedHostname);
+        if (existing) {
+            throw new common_1.BadRequestException('El hostname ya existe');
+        }
+        const newHostname = this.hostnameRepository.create({
+            hostname: normalizedHostname,
+        });
+        return this.hostnameRepository.save(newHostname);
     }
     async registerWithUser(hostname, userId) {
         const normalizedHostname = hostname.toLowerCase().trim();
-        const existing = await this.hostnamesRepository.findOne({
-            where: { hostname: normalizedHostname },
-        });
-        if (existing) {
-            throw new Error('Hostname already taken');
+        let existingHostname = await this.findByHostname(normalizedHostname);
+        if (existingHostname) {
+            throw new common_1.BadRequestException('El hostname ya está en uso');
         }
-        const newHostname = this.hostnamesRepository.create({
+        const newHostname = this.hostnameRepository.create({
             hostname: normalizedHostname,
         });
-        return this.hostnamesRepository.save(newHostname);
+        return this.hostnameRepository.save(newHostname);
+    }
+    async remove(id) {
+        const hostname = await this.findOne(id);
+        await this.hostnameRepository.remove(hostname);
     }
 };
 exports.HostnamesService = HostnamesService;
 exports.HostnamesService = HostnamesService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(hostname_entity_1.Hostname)),
+    __param(0, (0, typeorm_1.InjectRepository)(entities_1.Hostname)),
     __metadata("design:paramtypes", [typeorm_2.Repository])
 ], HostnamesService);
 //# sourceMappingURL=hostnames.service.js.map

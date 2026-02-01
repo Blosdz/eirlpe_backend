@@ -13,20 +13,20 @@ exports.UserProfile = void 0;
 const typeorm_1 = require("typeorm");
 const user_entity_1 = require("./user.entity");
 const hostname_entity_1 = require("./hostname.entity");
-const template_user_personalization_entity_1 = require("./template-user-personalization.entity");
 let UserProfile = class UserProfile {
     id;
-    users_id;
+    usersId;
     document;
     phone;
-    company_name;
-    hostname_id;
-    template_user_id;
-    created_at;
-    updated_at;
+    companyName;
+    address;
+    rucCompany;
+    hostnameId;
+    templateUserId;
+    createdAt;
+    updatedAt;
     user;
     hostname;
-    templateUserPersonalization;
 };
 exports.UserProfile = UserProfile;
 __decorate([
@@ -34,9 +34,9 @@ __decorate([
     __metadata("design:type", Number)
 ], UserProfile.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'int' }),
+    (0, typeorm_1.Column)({ name: 'users_id' }),
     __metadata("design:type", Number)
-], UserProfile.prototype, "users_id", void 0);
+], UserProfile.prototype, "usersId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 100, nullable: true }),
     __metadata("design:type", String)
@@ -46,44 +46,45 @@ __decorate([
     __metadata("design:type", String)
 ], UserProfile.prototype, "phone", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255, nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', name: 'company_name', length: 255, nullable: true }),
     __metadata("design:type", String)
-], UserProfile.prototype, "company_name", void 0);
+], UserProfile.prototype, "companyName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'int' }),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 500, nullable: true }),
+    __metadata("design:type", String)
+], UserProfile.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'ruc_company', length: 100 }),
+    __metadata("design:type", String)
+], UserProfile.prototype, "rucCompany", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'hostname_id' }),
     __metadata("design:type", Number)
-], UserProfile.prototype, "hostname_id", void 0);
+], UserProfile.prototype, "hostnameId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'template_user_id', nullable: true }),
     __metadata("design:type", Number)
-], UserProfile.prototype, "template_user_id", void 0);
+], UserProfile.prototype, "templateUserId", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)
-], UserProfile.prototype, "created_at", void 0);
+], UserProfile.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
     __metadata("design:type", Date)
-], UserProfile.prototype, "updated_at", void 0);
+], UserProfile.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.userProfiles, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, user => user.userProfiles, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'users_id' }),
     __metadata("design:type", user_entity_1.User)
 ], UserProfile.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => hostname_entity_1.Hostname, (hostname) => hostname.userProfiles, {
-        onDelete: 'CASCADE',
-    }),
+    (0, typeorm_1.ManyToOne)(() => hostname_entity_1.Hostname, hostname => hostname.userProfiles, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'hostname_id' }),
     __metadata("design:type", hostname_entity_1.Hostname)
 ], UserProfile.prototype, "hostname", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => template_user_personalization_entity_1.TemplateUserPersonalization, (templateUserPersonalization) => templateUserPersonalization.userProfiles, { nullable: true, onDelete: 'SET NULL' }),
-    (0, typeorm_1.JoinColumn)({ name: 'template_user_id' }),
-    __metadata("design:type", template_user_personalization_entity_1.TemplateUserPersonalization)
-], UserProfile.prototype, "templateUserPersonalization", void 0);
 exports.UserProfile = UserProfile = __decorate([
     (0, typeorm_1.Entity)('user_profile'),
-    (0, typeorm_1.Unique)('unique_user_hostname', ['user', 'hostname'])
+    (0, typeorm_1.Unique)(['user', 'hostname'])
 ], UserProfile);
 //# sourceMappingURL=user-profile.entity.js.map

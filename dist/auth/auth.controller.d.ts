@@ -8,13 +8,13 @@ export declare class AuthController {
         message: string;
         access_token: string;
         user: {
-            id: any;
+            id: number;
             email: string;
             name: string;
             userProfile: {
-                document: string | null;
-                phone: string | null;
-                company_name: string | null;
+                document: string | undefined;
+                phone: string | undefined;
+                company_name: string | undefined;
                 hostname_id: number;
                 hostname: string;
             };
@@ -27,12 +27,19 @@ export declare class AuthController {
         success: boolean;
         access_token: string;
         user: {
-            id: any;
-            email: any;
-            userProfile: any;
+            id: number;
+            email: string;
+            userProfile: import("../entities").UserProfile | null;
         };
     }>;
-    getUserHostnames(userId: number): Promise<any>;
+    getUserHostnames(userId: number): Promise<{
+        id: number;
+        hostname: string;
+        created_at: Date;
+        company_name: string | undefined;
+        document: string | undefined;
+        phone: string | undefined;
+    }[]>;
     getProfile(req: any): Promise<{
         success: boolean;
         user: any;

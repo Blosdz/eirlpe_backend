@@ -1,24 +1,26 @@
 import { JwtService } from '@nestjs/jwt';
-import { DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HostnamesService } from '../hostnames/hostnames.service';
+import { User, UserProfile } from '../entities';
 export declare class AuthService {
-    private dataSource;
+    private userRepository;
+    private userProfileRepository;
     private hostnamesService;
     private jwtService;
-    constructor(dataSource: DataSource, hostnamesService: HostnamesService, jwtService: JwtService);
+    constructor(userRepository: Repository<User>, userProfileRepository: Repository<UserProfile>, hostnamesService: HostnamesService, jwtService: JwtService);
     register(createUserDto: CreateUserDto): Promise<{
         success: boolean;
         message: string;
         access_token: string;
         user: {
-            id: any;
+            id: number;
             email: string;
             name: string;
             userProfile: {
-                document: string | null;
-                phone: string | null;
-                company_name: string | null;
+                document: string | undefined;
+                phone: string | undefined;
+                company_name: string | undefined;
                 hostname_id: number;
                 hostname: string;
             };
@@ -28,10 +30,17 @@ export declare class AuthService {
         success: boolean;
         access_token: string;
         user: {
-            id: any;
-            email: any;
-            userProfile: any;
+            id: number;
+            email: string;
+            userProfile: UserProfile | null;
         };
     }>;
-    getUserHostnames(userId: number): Promise<any>;
+    getUserHostnames(userId: number): Promise<{
+        id: number;
+        hostname: string;
+        created_at: Date;
+        company_name: string | undefined;
+        document: string | undefined;
+        phone: string | undefined;
+    }[]>;
 }

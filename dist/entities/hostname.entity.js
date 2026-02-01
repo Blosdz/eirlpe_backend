@@ -12,15 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Hostname = void 0;
 const typeorm_1 = require("typeorm");
 const user_profile_entity_1 = require("./user-profile.entity");
-const template_user_personalization_entity_1 = require("../entities/template-user-personalization.entity");
 let Hostname = class Hostname {
     id;
     hostname;
-    template_user_personalization;
-    created_at;
-    updated_at;
+    createdAt;
+    updatedAt;
     userProfiles;
-    templateUserPersonalizations;
 };
 exports.Hostname = Hostname;
 __decorate([
@@ -28,31 +25,22 @@ __decorate([
     __metadata("design:type", Number)
 ], Hostname.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255 }),
+    (0, typeorm_1.Column)({ unique: true, length: 255 }),
     __metadata("design:type", String)
 ], Hostname.prototype, "hostname", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
-    __metadata("design:type", Number)
-], Hostname.prototype, "template_user_personalization", void 0);
-__decorate([
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)
-], Hostname.prototype, "created_at", void 0);
+], Hostname.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
     __metadata("design:type", Date)
-], Hostname.prototype, "updated_at", void 0);
+], Hostname.prototype, "updatedAt", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => user_profile_entity_1.UserProfile, (userProfile) => userProfile.hostname),
+    (0, typeorm_1.OneToMany)(() => user_profile_entity_1.UserProfile, userProfile => userProfile.hostname),
     __metadata("design:type", Array)
 ], Hostname.prototype, "userProfiles", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => template_user_personalization_entity_1.TemplateUserPersonalization, (templateUserPersonalization) => templateUserPersonalization.hostname),
-    __metadata("design:type", Array)
-], Hostname.prototype, "templateUserPersonalizations", void 0);
 exports.Hostname = Hostname = __decorate([
-    (0, typeorm_1.Entity)('hostnames'),
-    (0, typeorm_1.Unique)(['hostname'])
+    (0, typeorm_1.Entity)('hostnames')
 ], Hostname);
 //# sourceMappingURL=hostname.entity.js.map

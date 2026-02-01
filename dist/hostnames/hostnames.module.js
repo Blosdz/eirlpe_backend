@@ -9,15 +9,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostnamesModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const hostname_entity_1 = require("../entities/hostname.entity");
 const hostnames_service_1 = require("./hostnames.service");
 const hostnames_controller_1 = require("./hostnames.controller");
+const entities_1 = require("../entities");
 let HostnamesModule = class HostnamesModule {
 };
 exports.HostnamesModule = HostnamesModule;
 exports.HostnamesModule = HostnamesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([hostname_entity_1.Hostname])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([entities_1.Hostname])],
         controllers: [hostnames_controller_1.HostnamesController],
         providers: [hostnames_service_1.HostnamesService],
         exports: [hostnames_service_1.HostnamesService],

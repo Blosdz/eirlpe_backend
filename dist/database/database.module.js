@@ -14,38 +14,9 @@ let DatabaseModule = class DatabaseModule {
 };
 exports.DatabaseModule = DatabaseModule;
 exports.DatabaseModule = DatabaseModule = __decorate([
+    (0, common_1.Global)(),
     (0, common_1.Module)({
-        imports: [
-            typeorm_1.TypeOrmModule.forRootAsync({
-                useFactory: () => ({
-                    type: 'postgres',
-                    host: process.env.DB_HOST || 'localhost',
-                    port: parseInt(process.env.DB_PORT || '5432'),
-                    username: process.env.DB_USERNAME || 'postgres',
-                    password: process.env.DB_PASSWORD || 'postgres',
-                    database: process.env.DB_NAME || 'irl',
-                    schema: process.env.DB_SCHEMA || 'eirl',
-                    entities: [
-                        entities_1.Hostname,
-                        entities_1.User,
-                        entities_1.UserProfile,
-                        entities_1.Template,
-                        entities_1.TemplateUserPersonalization,
-                        entities_1.Cobro,
-                    ],
-                    synchronize: process.env.NODE_ENV !== 'production',
-                    logging: process.env.NODE_ENV !== 'production',
-                }),
-            }),
-            typeorm_1.TypeOrmModule.forFeature([
-                entities_1.Hostname,
-                entities_1.User,
-                entities_1.UserProfile,
-                entities_1.Template,
-                entities_1.TemplateUserPersonalization,
-                entities_1.Cobro,
-            ]),
-        ],
+        imports: [typeorm_1.TypeOrmModule.forFeature([entities_1.User, entities_1.Hostname, entities_1.UserProfile, entities_1.Available])],
         exports: [typeorm_1.TypeOrmModule],
     })
 ], DatabaseModule);
