@@ -15,7 +15,16 @@ const users_module_1 = require("./users/users.module");
 const hostnames_module_1 = require("./hostnames/hostnames.module");
 const user_profile_module_1 = require("./user-profile/user-profile.module");
 const available_module_1 = require("./available/available.module");
+const tenant_module_1 = require("./tenant/tenant.module");
+const tenant_middleware_1 = require("./tenant/middleware/tenant.middleware");
+const tenant_contacts_module_1 = require("./tenant-contacts/tenant-contacts.module");
+const tenant_users_module_1 = require("./tenant-users/tenant-users.module");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer
+            .apply(tenant_middleware_1.TenantMiddleware)
+            .forRoutes({ path: '*', method: common_1.RequestMethod.ALL });
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
@@ -32,10 +41,13 @@ exports.AppModule = AppModule = __decorate([
                 password: process.env.DB_PASSWORD || '',
                 database: process.env.DB_NAME || 'eirl',
                 schema: process.env.DB_SCHEMA || 'eirl',
-                entities: [__dirname + '/**/*.entity{.ts,.js}'],
+                entities: [__dirname + '/entities/*.entity{.ts,.js}'],
                 synchronize: process.env.NODE_ENV === 'development',
                 logging: process.env.NODE_ENV === 'development',
             }),
+            tenant_module_1.TenantModule,
+            tenant_contacts_module_1.TenantContactsModule,
+            tenant_users_module_1.TenantUsersModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             hostnames_module_1.HostnamesModule,

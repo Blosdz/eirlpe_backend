@@ -1,13 +1,17 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Hostname } from '../entities';
+import { TenantConnectionService } from '../tenant/tenant-connection.service';
 
 @Injectable()
 export class HostnamesService {
+  private readonly logger = new Logger(HostnamesService.name);
+
   constructor(
     @InjectRepository(Hostname)
     private hostnameRepository: Repository<Hostname>,
+    private tenantConnectionService: TenantConnectionService,
   ) {}
 
   async findAll(): Promise<Hostname[]> {
@@ -48,13 +52,24 @@ export class HostnamesService {
       hostname: normalizedHostname,
     });
 
-    return this.hostnameRepository.save(newHostname);
+    const savedHostname = await this.hostnameRepository.save(newHostname);
+
+    try {
+      await this.tenantConnectionService.createTenantDatabase(normalizedHostname);
+      this.logger.log(`Tenant database created for: ${normalizedHostname}`);
+    } catch (error) {
+      this.logger.error(`Failed to create tenant database: ${error.message}`);
+      await this.hostnameRepository.remove(savedHostname);
+      throw new BadRequestException('Failed to create tenant database');
+    }
+
+    return savedHostname;
   }
 
   async registerWithUser(hostname: string, userId: number): Promise<Hostname> {
     const normalizedHostname = hostname.toLowerCase().trim();
 
-    let existingHostname = await this.findByHostname(normalizedHostname);
+    const existingHostname = await this.findByHostname(normalizedHostname);
     if (existingHostname) {
       throw new BadRequestException('El hostname ya está en uso');
     }
@@ -63,7 +78,18 @@ export class HostnamesService {
       hostname: normalizedHostname,
     });
 
-    return this.hostnameRepository.save(newHostname);
+    const savedHostname = await this.hostnameRepository.save(newHostname);
+
+    try {
+      await this.tenantConnectionService.createTenantDatabase(normalizedHostname);
+      this.logger.log(`Tenant database created for user ${userId}: ${normalizedHostname}`);
+    } catch (error) {
+      this.logger.error(`Failed to create tenant database: ${error.message}`);
+      await this.hostnameRepository.remove(savedHostname);
+      throw new BadRequestException('Failed to create tenant database');
+    }
+
+    return savedHostname;
   }
 
   async remove(id: number): Promise<void> {

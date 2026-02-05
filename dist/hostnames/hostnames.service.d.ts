@@ -1,8 +1,11 @@
 import { Repository } from 'typeorm';
 import { Hostname } from '../entities';
+import { TenantConnectionService } from '../tenant/tenant-connection.service';
 export declare class HostnamesService {
     private hostnameRepository;
-    constructor(hostnameRepository: Repository<Hostname>);
+    private tenantConnectionService;
+    private readonly logger;
+    constructor(hostnameRepository: Repository<Hostname>, tenantConnectionService: TenantConnectionService);
     findAll(): Promise<Hostname[]>;
     findOne(id: number): Promise<Hostname>;
     findByHostname(hostname: string): Promise<Hostname | null>;
