@@ -10,6 +10,9 @@ export class TenantContact {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 150, nullable: true })
+  name: string;
+
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone: string;
 

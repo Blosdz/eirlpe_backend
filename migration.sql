@@ -1,188 +1,85 @@
 -- Seed Templates for eirl.pe platform
--- Insert initial template options
+-- Aligned with actual page_templates/ directories on disk
 
--- Template 1: Professional Business
+-- Limpiar registros anteriores si existen
+DELETE FROM eirl.template;
+
+-- Template 1: Plan Básico — Opción 1 (moderna con iconos)
 INSERT INTO eirl.template (template_json, folder_template, prices_stimation)
 VALUES (
   '{
-    "version": "1.0.0",
-    "companyName": "Tu Empresa",
-    "sections": {
-      "jumbotron": {
-        "enabled": true,
-        "title": "Bienvenido a Tu Empresa",
-        "subtitle": "Soluciones profesionales para tu negocio",
-        "backgroundImage": "/templates/professional/hero-bg.jpg",
-        "ctaButton": {
-          "text": "Conocer Más",
-          "link": "#about"
-        }
-      },
-      "aboutUs": {
-        "enabled": true,
-        "title": "Sobre Nosotros",
-        "description": "Somos una empresa comprometida con la excelencia y la innovación. Con años de experiencia en el mercado, ofrecemos soluciones personalizadas para cada cliente.",
-        "image": "/templates/professional/about.jpg",
-        "highlights": [
-          "Más de 10 años de experiencia",
-          "Equipo altamente calificado",
-          "Compromiso con la calidad",
-          "Atención personalizada"
-        ]
-      },
-      "ourWork": {
-        "enabled": true,
-        "title": "Nuestros Proyectos",
-        "description": "Conoce algunos de nuestros trabajos más destacados",
-        "items": []
-      },
-      "contactUs": {
-        "enabled": true,
-        "title": "Contáctanos",
-        "description": "¿Tienes alguna pregunta? Estamos aquí para ayudarte",
-        "email": "contacto@tuempresa.com",
-        "phone": "+51 999 999 999",
-        "address": "Av. Principal 123, Lima, Perú",
-        "socialMedia": {
-          "facebook": "",
-          "instagram": "",
-          "linkedin": ""
-        },
-        "showForm": true
-      }
-    },
-    "theme": {
-      "primaryColor": "#2563EB",
-      "secondaryColor": "#1E40AF",
-      "fontFamily": "Inter, sans-serif",
-      "logoUrl": ""
-    }
+    "name": "Plan Básico — Opción 1",
+    "description": "Diseño moderno con sección de servicios con iconos, hero llamativo y formulario de contacto.",
+    "preview_image": "/previews/plan-basico-opcion-1.png",
+    "markers": [
+      "ESTILO_FUENTE",
+      "ESTILO_COLOR",
+      "LOGO_EMPRESA",
+      "TITULO_PRINCIPAL",
+      "SUBTITULO_DESCRIPTIVO",
+      "TEXTO_BOTON_PRINCIPAL",
+      "TEXTO_BOTON_SECUNDARIO",
+      "TITULO_SECCION_SERVICIOS",
+      "DESCRIPCION_SERVICIOS",
+      "ICONO_1",
+      "TITULO_SERVICIO_1",
+      "DESCRIPCION_SERVICIO_1",
+      "ICONO_2",
+      "TITULO_SERVICIO_2",
+      "DESCRIPCION_SERVICIO_2",
+      "ICONO_3",
+      "TITULO_SERVICIO_3",
+      "DESCRIPCION_SERVICIO_3",
+      "TITULO_SECCION_SOBRE_NOSOTROS",
+      "DESCRIPCION_SOBRE_NOSOTROS_PARRAFO_1",
+      "DESCRIPCION_SOBRE_NOSOTROS_PARRAFO_2",
+      "IMAGEN_SOBRE_NOSOTROS",
+      "EMAIL_CONTACTO",
+      "TELEFONO_CONTACTO",
+      "DIRECCION_CONTACTO",
+      "TEXTO_FOOTER",
+      "NOMBRE_EMPRESA",
+      "LOGO_WEBAPP"
+    ]
   }',
-  'professional-business',
-  99.99
+  'plan-basico-opcion-1',
+  49.99
 );
 
--- Template 2: Modern Portfolio
+-- Template 2: Plan Básico — Opción 2 (clásica, más simple)
 INSERT INTO eirl.template (template_json, folder_template, prices_stimation)
 VALUES (
   '{
-    "version": "1.0.0",
-    "companyName": "Mi Portfolio",
-    "sections": {
-      "jumbotron": {
-        "enabled": true,
-        "title": "Diseño Creativo & Desarrollo",
-        "subtitle": "Transformando ideas en realidad digital",
-        "backgroundImage": "/templates/modern/hero-bg.jpg",
-        "ctaButton": {
-          "text": "Ver Proyectos",
-          "link": "#work"
-        }
-      },
-      "aboutUs": {
-        "enabled": true,
-        "title": "Acerca de Mí",
-        "description": "Diseñador y desarrollador con pasión por crear experiencias digitales únicas y memorables.",
-        "image": "/templates/modern/profile.jpg",
-        "highlights": [
-          "Diseño UI/UX",
-          "Desarrollo Web",
-          "Branding",
-          "Diseño Gráfico"
-        ]
-      },
-      "ourWork": {
-        "enabled": true,
-        "title": "Portfolio",
-        "description": "Una selección de mis proyectos más recientes",
-        "items": []
-      },
-      "contactUs": {
-        "enabled": true,
-        "title": "¿Trabajamos Juntos?",
-        "description": "Estoy disponible para nuevos proyectos",
-        "email": "hola@miportfolio.com",
-        "phone": "+51 999 888 777",
-        "address": "",
-        "socialMedia": {
-          "instagram": "",
-          "linkedin": "",
-          "twitter": ""
-        },
-        "showForm": true
-      }
-    },
-    "theme": {
-      "primaryColor": "#10B981",
-      "secondaryColor": "#059669",
-      "fontFamily": "Poppins, sans-serif",
-      "logoUrl": ""
-    }
+    "name": "Plan Básico — Opción 2",
+    "description": "Diseño clásico y elegante, más simple, enfocado en texto y contacto.",
+    "preview_image": "/previews/plan-basico-opcion-2.png",
+    "markers": [
+      "ESTILO_FUENTE",
+      "ESTILO_COLOR",
+      "LOGO_EMPRESA",
+      "TITULO_PRINCIPAL",
+      "SUBTITULO_DESCRIPTIVO",
+      "TEXTO_BOTON_PRINCIPAL",
+      "TITULO_SERVICIO_1",
+      "DESCRIPCION_SERVICIO_1",
+      "TITULO_SERVICIO_2",
+      "DESCRIPCION_SERVICIO_2",
+      "TITULO_SERVICIO_3",
+      "DESCRIPCION_SERVICIO_3",
+      "TITULO_SECCION_SOBRE_NOSOTROS",
+      "DESCRIPCION_SOBRE_NOSOTROS_PARRAFO_1",
+      "DESCRIPCION_SOBRE_NOSOTROS_PARRAFO_2",
+      "EMAIL_CONTACTO",
+      "TELEFONO_CONTACTO",
+      "DIRECCION_CONTACTO",
+      "TEXTO_FOOTER",
+      "NOMBRE_EMPRESA",
+      "LOGO_WEBAPP"
+    ]
   }',
-  'modern-portfolio',
-  79.99
+  'plan-basico-opcion-2',
+  49.99
 );
 
--- Template 3: E-commerce Basic
-INSERT INTO eirl.template (template_json, folder_template, prices_stimation)
-VALUES (
-  '{
-    "version": "1.0.0",
-    "companyName": "Tu Tienda Online",
-    "sections": {
-      "jumbotron": {
-        "enabled": true,
-        "title": "Las Mejores Ofertas del Mercado",
-        "subtitle": "Productos de calidad al mejor precio",
-        "backgroundImage": "/templates/ecommerce/hero-bg.jpg",
-        "ctaButton": {
-          "text": "Ver Catálogo",
-          "link": "#products"
-        }
-      },
-      "aboutUs": {
-        "enabled": true,
-        "title": "Nuestra Historia",
-        "description": "Desde 2020, brindamos los mejores productos con envío a todo el Perú. Calidad garantizada y atención excepcional.",
-        "image": "/templates/ecommerce/store.jpg",
-        "highlights": [
-          "Envío gratis en compras mayores a S/100",
-          "Garantía de satisfacción",
-          "Productos certificados",
-          "Atención 24/7"
-        ]
-      },
-      "ourWork": {
-        "enabled": true,
-        "title": "Productos Destacados",
-        "description": "Descubre nuestros productos más populares",
-        "items": []
-      },
-      "contactUs": {
-        "enabled": true,
-        "title": "Atención al Cliente",
-        "description": "¿Necesitas ayuda? Contáctanos",
-        "email": "ventas@tutienda.com",
-        "phone": "+51 999 777 666",
-        "address": "Jr. Comercio 456, Lima, Perú",
-        "socialMedia": {
-          "facebook": "",
-          "instagram": "",
-          "whatsapp": ""
-        },
-        "showForm": true
-      }
-    },
-    "theme": {
-      "primaryColor": "#F59E0B",
-      "secondaryColor": "#D97706",
-      "fontFamily": "Roboto, sans-serif",
-      "logoUrl": ""
-    }
-  }',
-  'ecommerce-basic',
-  149.99
-);
-
--- Verify inserted templates
+-- Verificar templates insertados
 SELECT id, folder_template, prices_stimation, created_at FROM eirl.template;

@@ -10,7 +10,7 @@ export declare class AuthController {
         user: {
             id: number;
             email: string;
-            name: string;
+            name: string | undefined;
             userProfile: {
                 document: string | undefined;
                 phone: string | undefined;
@@ -18,6 +18,16 @@ export declare class AuthController {
                 hostname_id: number;
                 hostname: string;
             };
+        };
+    } | {
+        success: boolean;
+        message: string;
+        access_token: string;
+        user: {
+            id: number;
+            email: string;
+            name: string | undefined;
+            userProfile?: undefined;
         };
     }>;
     login(body: {

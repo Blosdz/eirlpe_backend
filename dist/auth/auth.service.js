@@ -69,40 +69,54 @@ let AuthService = class AuthService {
         if (!email || !password) {
             throw new common_1.BadRequestException('Email y contraseña son requeridos');
         }
-        if (!userProfile.hostname_id) {
-            throw new common_1.BadRequestException('El hostname es requerido');
-        }
-        const hostnameValue = userProfile.hostname_id.toLowerCase().trim();
-        const hostnameRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
-        if (!hostnameRegex.test(hostnameValue)) {
-            throw new common_1.BadRequestException('El hostname solo puede contener letras minúsculas, números y guiones. No puede comenzar ni terminar con un guión.');
-        }
-        if (hostnameValue.length < 3 || hostnameValue.length > 63) {
-            throw new common_1.BadRequestException('El hostname debe tener entre 3 y 63 caracteres');
-        }
         const existingUser = await this.userRepository.findOne({ where: { email } });
         if (existingUser) {
             throw new common_1.BadRequestException('El email ya está registrado');
         }
-        const hostnameCheck = await this.hostnamesService.checkAvailability(hostnameValue);
-        if (!hostnameCheck.available) {
-            throw new common_1.BadRequestException('El hostname ya está en uso. Por favor elige otro.');
-        }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = this.userRepository.create({
-            email,
-            password: hashedPassword,
-        });
+        const newUser = this.userRepository.create({ email, password: hashedPassword });
         const savedUser = await this.userRepository.save(newUser);
-        const hostname = await this.hostnamesService.registerWithUser(hostnameValue, savedUser.id);
-        const newProfile = new entities_1.UserProfile();
-        newProfile.usersId = savedUser.id;
-        newProfile.document = userProfile.document;
-        newProfile.phone = userProfile.phone;
-        newProfile.companyName = userProfile.company_name;
-        newProfile.hostnameId = hostname.id;
-        newProfile.rucCompany = userProfile.ruc_company;
-        await this.userProfileRepository.save(newProfile);
+        if (userProfile?.hostname_id) {
+            const hostnameValue = userProfile.hostname_id.toLowerCase().trim();
+            const hostnameRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
+            if (!hostnameRegex.test(hostnameValue) || hostnameValue.length < 3 || hostnameValue.length > 63) {
+                await this.userRepository.remove(savedUser);
+                throw new common_1.BadRequestException('El hostname solo puede contener letras minúsculas, números y guiones (3-63 chars)');
+            }
+            const hostnameCheck = await this.hostnamesService.checkAvailability(hostnameValue);
+            if (!hostnameCheck.available) {
+                await this.userRepository.remove(savedUser);
+                throw new common_1.BadRequestException('El hostname ya está en uso. Por favor elige otro.');
+            }
+            const hostname = await this.hostnamesService.registerWithUser(hostnameValue, savedUser.id);
+            const newProfile = new entities_1.UserProfile();
+            newProfile.usersId = savedUser.id;
+            newProfile.document = userProfile.document;
+            newProfile.phone = userProfile.phone;
+            newProfile.companyName = userProfile.company_name;
+            newProfile.hostnameId = hostname.id;
+            newProfile.rucCompany = userProfile.ruc_company ?? '';
+            await this.userProfileRepository.save(newProfile);
+            const payload = { sub: savedUser.id, email: savedUser.email };
+            const access_token = this.jwtService.sign(payload);
+            return {
+                success: true,
+                message: 'Usuario registrado correctamente',
+                access_token,
+                user: {
+                    id: savedUser.id,
+                    email: savedUser.email,
+                    name,
+                    userProfile: {
+                        document: userProfile.document,
+                        phone: userProfile.phone,
+                        company_name: userProfile.company_name,
+                        hostname_id: hostname.id,
+                        hostname: hostname.hostname,
+                    },
+                },
+            };
+        }
         const payload = { sub: savedUser.id, email: savedUser.email };
         const access_token = this.jwtService.sign(payload);
         return {
@@ -112,14 +126,7 @@ let AuthService = class AuthService {
             user: {
                 id: savedUser.id,
                 email: savedUser.email,
-                name: name,
-                userProfile: {
-                    document: userProfile.document,
-                    phone: userProfile.phone,
-                    company_name: userProfile.company_name,
-                    hostname_id: hostname.id,
-                    hostname: hostname.hostname,
-                },
+                name,
             },
         };
     }

@@ -7,7 +7,7 @@ export declare class UserProfile {
     phone?: string;
     companyName?: string;
     address?: string;
-    rucCompany: string;
+    rucCompany?: string;
     hostnameId: number;
     templateUserId: number;
     createdAt: Date;

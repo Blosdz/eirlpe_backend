@@ -5,7 +5,10 @@ export declare class TenantService {
     private hostnameRepository;
     private tenantConnectionService;
     private hostnameCache;
+    private notFoundCache;
+    private notFoundExpiry;
     private readonly CACHE_TTL;
+    private readonly NOT_FOUND_TTL;
     constructor(hostnameRepository: Repository<Hostname>, tenantConnectionService: TenantConnectionService);
     resolveHostname(hostname: string): Promise<{
         id: number;

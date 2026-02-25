@@ -23,8 +23,8 @@ export class UserProfile {
   @Column({ type: 'varchar', length: 500, nullable: true })
   address?: string;
 
-  @Column({ name: 'ruc_company', length: 100 })
-  rucCompany: string;
+  @Column({ name: 'ruc_company', length: 100, nullable: true })
+  rucCompany?: string;
 
   @Column({ name: 'hostname_id' })
   hostnameId: number;

@@ -17,20 +17,22 @@ CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
+  role VARCHAR(50) DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- template se queda con config
--- Template table
--- CREATE TABLE template (
---   id SERIAL PRIMARY KEY,
---   template_json TEXT NOT NULL,
---   folder_template VARCHAR(500),
---   prices_stimation DECIMAL(10, 2),
---   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
+-- Catálogo de templates disponibles en la plataforma eirl.pe
+-- Los tenants referencian un template por su folder_template (ej. 'professional-business')
+CREATE TABLE IF NOT EXISTS eirl.template (
+  id                SERIAL PRIMARY KEY,
+  template_json     TEXT            NOT NULL,
+  folder_template   VARCHAR(500)    UNIQUE,
+  prices_stimation  DECIMAL(10, 2),
+  created_at        TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_template_folder ON eirl.template(folder_template);
 
 -- tabla config mantener en comentario
 -- Template User Personalization table
@@ -57,8 +59,7 @@ CREATE TABLE user_profile (
   phone VARCHAR(20),
   company_name VARCHAR(255),
   address VARCHAR(500),
-  -- obligatorio 
-  ruc_company VARCHAR(100) NOT NULL,
+  ruc_company VARCHAR(100),
   hostname_id INT NOT NULL,
   template_user_id INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

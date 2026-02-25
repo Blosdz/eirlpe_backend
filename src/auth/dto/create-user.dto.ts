@@ -18,14 +18,14 @@ export class UserProfileDto {
   @IsString()
   address?: string;
 
-  @IsNotEmpty({ message: 'El RUC de la empresa es requerido' })
+  @IsOptional()
   @IsString()
-  ruc_company: string;
+  ruc_company?: string;
 
-  @IsNotEmpty({ message: 'El hostname es requerido' })
+  @IsOptional()
   @IsString()
   @MinLength(3, { message: 'El hostname debe tener al menos 3 caracteres' })
-  hostname_id: string;
+  hostname_id?: string;
 }
 
 export class CreateUserDto {
@@ -38,11 +38,12 @@ export class CreateUserDto {
   @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
   password: string;
 
-  @IsNotEmpty({ message: 'El nombre es requerido' })
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
+  @IsOptional()
   @ValidateNested()
   @Type(() => UserProfileDto)
-  userProfile: UserProfileDto;
+  userProfile?: UserProfileDto;
 }

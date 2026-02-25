@@ -42,12 +42,12 @@ __decorate([
     __metadata("design:type", String)
 ], UserProfileDto.prototype, "address", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)({ message: 'El RUC de la empresa es requerido' }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UserProfileDto.prototype, "ruc_company", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)({ message: 'El hostname es requerido' }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(3, { message: 'El hostname debe tener al menos 3 caracteres' }),
     __metadata("design:type", String)
@@ -71,11 +71,12 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)({ message: 'El nombre es requerido' }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateNested)(),
     (0, class_transformer_1.Type)(() => UserProfileDto),
     __metadata("design:type", UserProfileDto)

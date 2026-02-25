@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { HostnamesService } from '../hostnames/hostnames.service';
 import { User, UserProfile } from '../entities';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from './enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -25,53 +26,67 @@ export class AuthService {
       throw new BadRequestException('Email y contraseña son requeridos');
     }
 
-    if (!userProfile.hostname_id) {
-      throw new BadRequestException('El hostname es requerido');
-    }
-
-    const hostnameValue = userProfile.hostname_id.toLowerCase().trim();
-    const hostnameRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
-
-    if (!hostnameRegex.test(hostnameValue)) {
-      throw new BadRequestException(
-        'El hostname solo puede contener letras minúsculas, números y guiones. No puede comenzar ni terminar con un guión.',
-      );
-    }
-
-    if (hostnameValue.length < 3 || hostnameValue.length > 63) {
-      throw new BadRequestException('El hostname debe tener entre 3 y 63 caracteres');
-    }
-
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       throw new BadRequestException('El email ya está registrado');
     }
 
-    const hostnameCheck = await this.hostnamesService.checkAvailability(hostnameValue);
-    if (!hostnameCheck.available) {
-      throw new BadRequestException('El hostname ya está en uso. Por favor elige otro.');
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = this.userRepository.create({
-      email,
-      password: hashedPassword,
-    });
+    const newUser = this.userRepository.create({ email, password: hashedPassword });
     const savedUser = await this.userRepository.save(newUser);
 
-    const hostname = await this.hostnamesService.registerWithUser(hostnameValue, savedUser.id);
+    // Flujo legacy: si se envía userProfile con hostname_id, crear hostname + perfil en el mismo paso
+    if (userProfile?.hostname_id) {
+      const hostnameValue = userProfile.hostname_id.toLowerCase().trim();
+      const hostnameRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
 
-    const newProfile = new UserProfile();
-    newProfile.usersId = savedUser.id;
-    newProfile.document = userProfile.document;
-    newProfile.phone = userProfile.phone;
-    newProfile.companyName = userProfile.company_name;
-    newProfile.hostnameId = hostname.id;
-    newProfile.rucCompany = userProfile.ruc_company;
-    await this.userProfileRepository.save(newProfile);
+      if (!hostnameRegex.test(hostnameValue) || hostnameValue.length < 3 || hostnameValue.length > 63) {
+        await this.userRepository.remove(savedUser);
+        throw new BadRequestException('El hostname solo puede contener letras minúsculas, números y guiones (3-63 chars)');
+      }
 
-    const payload = { sub: savedUser.id, email: savedUser.email };
+      const hostnameCheck = await this.hostnamesService.checkAvailability(hostnameValue);
+      if (!hostnameCheck.available) {
+        await this.userRepository.remove(savedUser);
+        throw new BadRequestException('El hostname ya está en uso. Por favor elige otro.');
+      }
+
+      const hostname = await this.hostnamesService.registerWithUser(hostnameValue, savedUser.id);
+
+      const newProfile = new UserProfile();
+      newProfile.usersId = savedUser.id;
+      newProfile.document = userProfile.document;
+      newProfile.phone = userProfile.phone;
+      newProfile.companyName = userProfile.company_name;
+      newProfile.hostnameId = hostname.id;
+      newProfile.rucCompany = userProfile.ruc_company ?? '';
+      await this.userProfileRepository.save(newProfile);
+
+      const payload = { sub: savedUser.id, email: savedUser.email, role: savedUser.role || 'user' };
+      const access_token = this.jwtService.sign(payload);
+
+      return {
+        success: true,
+        message: 'Usuario registrado correctamente',
+        access_token,
+        user: {
+          id: savedUser.id,
+          email: savedUser.email,
+          role: savedUser.role || 'user',
+          name,
+          userProfile: {
+            document: userProfile.document,
+            phone: userProfile.phone,
+            company_name: userProfile.company_name,
+            hostname_id: hostname.id,
+            hostname: hostname.hostname,
+          },
+        },
+      };
+    }
+
+    // Flujo nuevo (onboarding paso a paso): solo crear el usuario, el hostname se crea después via POST /hostnames
+    const payload = { sub: savedUser.id, email: savedUser.email, role: savedUser.role || 'user' };
     const access_token = this.jwtService.sign(payload);
 
     return {
@@ -81,14 +96,8 @@ export class AuthService {
       user: {
         id: savedUser.id,
         email: savedUser.email,
-        name: name,
-        userProfile: {
-          document: userProfile.document,
-          phone: userProfile.phone,
-          company_name: userProfile.company_name,
-          hostname_id: hostname.id,
-          hostname: hostname.hostname,
-        },
+        role: savedUser.role || 'user',
+        name,
       },
     };
   }
@@ -100,8 +109,16 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'password'],
     });
+
+    if (user) {
+      console.log('Backend AuthService - User found:', {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        allKeys: Object.keys(user)
+      });
+    }
 
     if (!user) {
       throw new UnauthorizedException('Email o contraseña incorrectos');
@@ -112,11 +129,16 @@ export class AuthService {
       throw new UnauthorizedException('Email o contraseña incorrectos');
     }
 
+    // Role fix: ensure role is populated (default to user if missing)
+    if (!user.role) {
+      user.role = user.email === 'admin@eirl.pe' ? 'admin' : 'user';
+    }
+
     const userProfile = await this.userProfileRepository.findOne({
       where: { usersId: user.id },
     });
 
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const access_token = this.jwtService.sign(payload);
 
     return {
@@ -125,6 +147,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role,
         userProfile: userProfile,
       },
     };

@@ -19,6 +19,9 @@ const tenant_module_1 = require("./tenant/tenant.module");
 const tenant_middleware_1 = require("./tenant/middleware/tenant.middleware");
 const tenant_contacts_module_1 = require("./tenant-contacts/tenant-contacts.module");
 const tenant_users_module_1 = require("./tenant-users/tenant-users.module");
+const tenant_config_module_1 = require("./tenant-config/tenant-config.module");
+const tenant_plugins_module_1 = require("./tenant-plugins/tenant-plugins.module");
+const tenant_page_module_1 = require("./tenant-page/tenant-page.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -48,6 +51,9 @@ exports.AppModule = AppModule = __decorate([
             tenant_module_1.TenantModule,
             tenant_contacts_module_1.TenantContactsModule,
             tenant_users_module_1.TenantUsersModule,
+            tenant_config_module_1.TenantConfigModule,
+            tenant_plugins_module_1.TenantPluginsModule,
+            tenant_page_module_1.TenantPageModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             hostnames_module_1.HostnamesModule,

@@ -30,8 +30,9 @@ let HostnamesController = class HostnamesController {
     async findOne(id) {
         return this.hostnamesService.findOne(id);
     }
-    async create(body) {
-        return this.hostnamesService.create(body.hostname);
+    async create(body, req) {
+        const userId = req.user?.sub ?? req.user?.id;
+        return this.hostnamesService.create(body.hostname, userId);
     }
     async remove(id) {
         await this.hostnamesService.remove(id);
@@ -65,8 +66,9 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], HostnamesController.prototype, "create", null);
 __decorate([

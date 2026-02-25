@@ -22,27 +22,39 @@ let TenantService = class TenantService {
     hostnameRepository;
     tenantConnectionService;
     hostnameCache = new Map();
+    notFoundCache = new Set();
+    notFoundExpiry = new Map();
     CACHE_TTL = 5 * 60 * 1000;
+    NOT_FOUND_TTL = 1 * 60 * 1000;
     constructor(hostnameRepository, tenantConnectionService) {
         this.hostnameRepository = hostnameRepository;
         this.tenantConnectionService = tenantConnectionService;
     }
     async resolveHostname(hostname) {
         const normalizedHostname = hostname.toLowerCase().trim();
+        const now = Date.now();
         const cached = this.hostnameCache.get(normalizedHostname);
-        if (cached && cached.expiresAt > Date.now()) {
+        if (cached && cached.expiresAt > now) {
             return { id: cached.id, hostname: normalizedHostname };
+        }
+        const notFoundExpiry = this.notFoundExpiry.get(normalizedHostname);
+        if (this.notFoundCache.has(normalizedHostname) && notFoundExpiry && notFoundExpiry > now) {
+            return null;
         }
         const hostnameEntity = await this.hostnameRepository.findOne({
             where: { hostname: normalizedHostname },
         });
         if (!hostnameEntity) {
+            this.notFoundCache.add(normalizedHostname);
+            this.notFoundExpiry.set(normalizedHostname, now + this.NOT_FOUND_TTL);
             return null;
         }
         this.hostnameCache.set(normalizedHostname, {
             id: hostnameEntity.id,
-            expiresAt: Date.now() + this.CACHE_TTL,
+            expiresAt: now + this.CACHE_TTL,
         });
+        this.notFoundCache.delete(normalizedHostname);
+        this.notFoundExpiry.delete(normalizedHostname);
         return { id: hostnameEntity.id, hostname: normalizedHostname };
     }
     async validateTenantExists(tenantId) {
@@ -68,6 +80,8 @@ let TenantService = class TenantService {
     }
     clearCache() {
         this.hostnameCache.clear();
+        this.notFoundCache.clear();
+        this.notFoundExpiry.clear();
     }
 };
 exports.TenantService = TenantService;

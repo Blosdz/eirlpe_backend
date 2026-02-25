@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Request, Patch } from '@nestjs/common';
 import { HostnamesService } from './hostnames.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -25,8 +25,15 @@ export class HostnamesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() body: { hostname: string }) {
-    return this.hostnamesService.create(body.hostname);
+  async create(@Body() body: { hostname: string }, @Request() req: any) {
+    const userId: number | undefined = req.user?.sub ?? req.user?.id;
+    return this.hostnamesService.create(body.hostname, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async update(@Param('id') id: number, @Body() body: { hostname: string }) {
+    return this.hostnamesService.update(id, body.hostname);
   }
 
   @UseGuards(JwtAuthGuard)

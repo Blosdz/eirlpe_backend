@@ -13,6 +13,7 @@ exports.TenantContact = void 0;
 const typeorm_1 = require("typeorm");
 let TenantContact = class TenantContact {
     id;
+    name;
     phone;
     mail;
     message;
@@ -24,6 +25,10 @@ __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], TenantContact.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 150, nullable: true }),
+    __metadata("design:type", String)
+], TenantContact.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'varchar', length: 20, nullable: true }),
     __metadata("design:type", String)

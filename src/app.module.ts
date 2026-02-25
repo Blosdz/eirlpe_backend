@@ -10,6 +10,9 @@ import { TenantModule } from './tenant/tenant.module';
 import { TenantMiddleware } from './tenant/middleware/tenant.middleware';
 import { TenantContactsModule } from './tenant-contacts/tenant-contacts.module';
 import { TenantUsersModule } from './tenant-users/tenant-users.module';
+import { TenantConfigModule } from './tenant-config/tenant-config.module';
+import { TenantPluginsModule } from './tenant-plugins/tenant-plugins.module';
+import { TenantPageModule } from './tenant-page/tenant-page.module';
 
 @Module({
   imports: [
@@ -31,6 +34,9 @@ import { TenantUsersModule } from './tenant-users/tenant-users.module';
     TenantModule,
     TenantContactsModule,
     TenantUsersModule,
+    TenantConfigModule,
+    TenantPluginsModule,
+    TenantPageModule,
     AuthModule,
     UsersModule,
     HostnamesModule,

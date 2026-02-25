@@ -17,7 +17,7 @@ let HostnamesModule = class HostnamesModule {
 exports.HostnamesModule = HostnamesModule;
 exports.HostnamesModule = HostnamesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([entities_1.Hostname])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([entities_1.Hostname, entities_1.UserProfile])],
         controllers: [hostnames_controller_1.HostnamesController],
         providers: [hostnames_service_1.HostnamesService],
         exports: [hostnames_service_1.HostnamesService],

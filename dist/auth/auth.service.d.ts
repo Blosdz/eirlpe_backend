@@ -16,7 +16,7 @@ export declare class AuthService {
         user: {
             id: number;
             email: string;
-            name: string;
+            name: string | undefined;
             userProfile: {
                 document: string | undefined;
                 phone: string | undefined;
@@ -24,6 +24,16 @@ export declare class AuthService {
                 hostname_id: number;
                 hostname: string;
             };
+        };
+    } | {
+        success: boolean;
+        message: string;
+        access_token: string;
+        user: {
+            id: number;
+            email: string;
+            name: string | undefined;
+            userProfile?: undefined;
         };
     }>;
     login(email: string, password: string): Promise<{

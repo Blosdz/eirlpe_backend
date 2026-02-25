@@ -54,7 +54,7 @@ __decorate([
     __metadata("design:type", String)
 ], UserProfile.prototype, "address", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'ruc_company', length: 100 }),
+    (0, typeorm_1.Column)({ name: 'ruc_company', length: 100, nullable: true }),
     __metadata("design:type", String)
 ], UserProfile.prototype, "rucCompany", void 0);
 __decorate([

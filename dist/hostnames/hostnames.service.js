@@ -21,10 +21,12 @@ const entities_1 = require("../entities");
 const tenant_connection_service_1 = require("../tenant/tenant-connection.service");
 let HostnamesService = HostnamesService_1 = class HostnamesService {
     hostnameRepository;
+    userProfileRepository;
     tenantConnectionService;
     logger = new common_1.Logger(HostnamesService_1.name);
-    constructor(hostnameRepository, tenantConnectionService) {
+    constructor(hostnameRepository, userProfileRepository, tenantConnectionService) {
         this.hostnameRepository = hostnameRepository;
+        this.userProfileRepository = userProfileRepository;
         this.tenantConnectionService = tenantConnectionService;
     }
     async findAll() {
@@ -49,16 +51,13 @@ let HostnamesService = HostnamesService_1 = class HostnamesService {
             hostname: hostname.toLowerCase(),
         };
     }
-    async create(hostname) {
+    async create(hostname, userId) {
         const normalizedHostname = hostname.toLowerCase().trim();
         const existing = await this.findByHostname(normalizedHostname);
         if (existing) {
             throw new common_1.BadRequestException('El hostname ya existe');
         }
-        const newHostname = this.hostnameRepository.create({
-            hostname: normalizedHostname,
-        });
-        const savedHostname = await this.hostnameRepository.save(newHostname);
+        const savedHostname = await this.hostnameRepository.save(this.hostnameRepository.create({ hostname: normalizedHostname }));
         try {
             await this.tenantConnectionService.createTenantDatabase(normalizedHostname);
             this.logger.log(`Tenant database created for: ${normalizedHostname}`);
@@ -68,28 +67,21 @@ let HostnamesService = HostnamesService_1 = class HostnamesService {
             await this.hostnameRepository.remove(savedHostname);
             throw new common_1.BadRequestException('Failed to create tenant database');
         }
+        if (userId) {
+            const existing = await this.userProfileRepository.findOne({
+                where: { usersId: userId, hostnameId: savedHostname.id },
+            });
+            if (!existing) {
+                await this.userProfileRepository.save(this.userProfileRepository.create({
+                    usersId: userId,
+                    hostnameId: savedHostname.id,
+                }));
+            }
+        }
         return savedHostname;
     }
     async registerWithUser(hostname, userId) {
-        const normalizedHostname = hostname.toLowerCase().trim();
-        const existingHostname = await this.findByHostname(normalizedHostname);
-        if (existingHostname) {
-            throw new common_1.BadRequestException('El hostname ya está en uso');
-        }
-        const newHostname = this.hostnameRepository.create({
-            hostname: normalizedHostname,
-        });
-        const savedHostname = await this.hostnameRepository.save(newHostname);
-        try {
-            await this.tenantConnectionService.createTenantDatabase(normalizedHostname);
-            this.logger.log(`Tenant database created for user ${userId}: ${normalizedHostname}`);
-        }
-        catch (error) {
-            this.logger.error(`Failed to create tenant database: ${error.message}`);
-            await this.hostnameRepository.remove(savedHostname);
-            throw new common_1.BadRequestException('Failed to create tenant database');
-        }
-        return savedHostname;
+        return this.create(hostname, userId);
     }
     async remove(id) {
         const hostname = await this.findOne(id);
@@ -100,7 +92,9 @@ exports.HostnamesService = HostnamesService;
 exports.HostnamesService = HostnamesService = HostnamesService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(entities_1.Hostname)),
+    __param(1, (0, typeorm_1.InjectRepository)(entities_1.UserProfile)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         tenant_connection_service_1.TenantConnectionService])
 ], HostnamesService);
 //# sourceMappingURL=hostnames.service.js.map

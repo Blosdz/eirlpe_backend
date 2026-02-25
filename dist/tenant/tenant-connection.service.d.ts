@@ -10,7 +10,14 @@ export declare class TenantConnectionService implements OnModuleDestroy {
     getConnection(hostname: string): Promise<DataSource>;
     createTenantDatabase(hostname: string): Promise<void>;
     private initializeTenantTables;
+    runMigrationOnAllTenants(sql: string, tenantHostnames: string[]): Promise<{
+        hostname: string;
+        success: boolean;
+        error?: string;
+    }[]>;
     tenantDatabaseExists(hostname: string): Promise<boolean>;
     closeConnection(hostname: string): Promise<void>;
     onModuleDestroy(): Promise<void>;
+    private evictIfNeeded;
+    private buildAdminDataSource;
 }
