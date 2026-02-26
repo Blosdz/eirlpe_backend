@@ -4,6 +4,7 @@ export declare class User {
     id: number;
     email: string;
     password: string;
+    role: string;
     createdAt: Date;
     updatedAt: Date;
     userProfiles: UserProfile[];

@@ -10,6 +10,7 @@ export declare class AuthController {
         user: {
             id: number;
             email: string;
+            role: string;
             name: string | undefined;
             userProfile: {
                 document: string | undefined;
@@ -26,6 +27,7 @@ export declare class AuthController {
         user: {
             id: number;
             email: string;
+            role: string;
             name: string | undefined;
             userProfile?: undefined;
         };
@@ -39,6 +41,7 @@ export declare class AuthController {
         user: {
             id: number;
             email: string;
+            role: string;
             userProfile: import("../entities").UserProfile | null;
         };
     }>;

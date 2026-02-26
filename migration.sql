@@ -1,6 +1,16 @@
 -- Seed Templates for eirl.pe platform
 -- Aligned with actual page_templates/ directories on disk
 
+-- Crear tabla si no existe
+CREATE TABLE IF NOT EXISTS eirl.template (
+  id                 SERIAL PRIMARY KEY,
+  template_json      JSONB         NOT NULL,
+  folder_template    VARCHAR(255)  NOT NULL UNIQUE,
+  prices_stimation   NUMERIC(10,2) NOT NULL DEFAULT 0,
+  created_at         TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
+
 -- Limpiar registros anteriores si existen
 DELETE FROM eirl.template;
 

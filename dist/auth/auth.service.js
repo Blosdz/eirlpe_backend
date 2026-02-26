@@ -97,7 +97,7 @@ let AuthService = class AuthService {
             newProfile.hostnameId = hostname.id;
             newProfile.rucCompany = userProfile.ruc_company ?? '';
             await this.userProfileRepository.save(newProfile);
-            const payload = { sub: savedUser.id, email: savedUser.email };
+            const payload = { sub: savedUser.id, email: savedUser.email, role: savedUser.role || 'user' };
             const access_token = this.jwtService.sign(payload);
             return {
                 success: true,
@@ -106,6 +106,7 @@ let AuthService = class AuthService {
                 user: {
                     id: savedUser.id,
                     email: savedUser.email,
+                    role: savedUser.role || 'user',
                     name,
                     userProfile: {
                         document: userProfile.document,
@@ -117,7 +118,7 @@ let AuthService = class AuthService {
                 },
             };
         }
-        const payload = { sub: savedUser.id, email: savedUser.email };
+        const payload = { sub: savedUser.id, email: savedUser.email, role: savedUser.role || 'user' };
         const access_token = this.jwtService.sign(payload);
         return {
             success: true,
@@ -126,6 +127,7 @@ let AuthService = class AuthService {
             user: {
                 id: savedUser.id,
                 email: savedUser.email,
+                role: savedUser.role || 'user',
                 name,
             },
         };
@@ -136,8 +138,15 @@ let AuthService = class AuthService {
         }
         const user = await this.userRepository.findOne({
             where: { email },
-            select: ['id', 'email', 'password'],
         });
+        if (user) {
+            console.log('Backend AuthService - User found:', {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                allKeys: Object.keys(user)
+            });
+        }
         if (!user) {
             throw new common_1.UnauthorizedException('Email o contraseña incorrectos');
         }
@@ -145,10 +154,13 @@ let AuthService = class AuthService {
         if (!passwordMatch) {
             throw new common_1.UnauthorizedException('Email o contraseña incorrectos');
         }
+        if (!user.role) {
+            user.role = user.email === 'admin@eirl.pe' ? 'admin' : 'user';
+        }
         const userProfile = await this.userProfileRepository.findOne({
             where: { usersId: user.id },
         });
-        const payload = { sub: user.id, email: user.email };
+        const payload = { sub: user.id, email: user.email, role: user.role };
         const access_token = this.jwtService.sign(payload);
         return {
             success: true,
@@ -156,6 +168,7 @@ let AuthService = class AuthService {
             user: {
                 id: user.id,
                 email: user.email,
+                role: user.role,
                 userProfile: userProfile,
             },
         };

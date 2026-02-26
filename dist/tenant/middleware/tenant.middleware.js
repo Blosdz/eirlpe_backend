@@ -18,6 +18,10 @@ const async_hooks_1 = require("async_hooks");
 const tenant_service_1 = require("../tenant.service");
 const tenant_connection_service_1 = require("../tenant-connection.service");
 const tenant_constants_1 = require("../tenant.constants");
+function extractSubdomain(raw) {
+    const withoutPort = raw.split(':')[0];
+    return withoutPort.split('.')[0].toLowerCase().trim();
+}
 let TenantMiddleware = class TenantMiddleware {
     tenantService;
     tenantConnectionService;
@@ -28,10 +32,11 @@ let TenantMiddleware = class TenantMiddleware {
         this.asyncLocalStorage = asyncLocalStorage;
     }
     async use(req, res, next) {
-        const hostname = req.headers[tenant_constants_1.TENANT_HEADER];
-        if (!hostname) {
+        const raw = req.headers[tenant_constants_1.TENANT_HEADER] || req.query.tenant;
+        if (!raw) {
             return next();
         }
+        const hostname = extractSubdomain(raw);
         const tenant = await this.tenantService.resolveHostname(hostname);
         if (!tenant) {
             return next();

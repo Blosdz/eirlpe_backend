@@ -83,6 +83,11 @@ let HostnamesService = HostnamesService_1 = class HostnamesService {
     async registerWithUser(hostname, userId) {
         return this.create(hostname, userId);
     }
+    async update(id, hostname) {
+        const existing = await this.findOne(id);
+        existing.hostname = hostname.toLowerCase().trim();
+        return this.hostnameRepository.save(existing);
+    }
     async remove(id) {
         const hostname = await this.findOne(id);
         await this.hostnameRepository.remove(hostname);

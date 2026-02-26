@@ -26,8 +26,18 @@ export class TenantGuard implements CanActivate {
     const tenant = request.tenant;
 
     if (!tenant || !tenant.tenantId) {
+      const headerValue = request.headers[TENANT_HEADER];
+      const queryValue = request.query.tenant;
+      const provided = (headerValue || queryValue) as string;
+
+      if (provided) {
+        throw new BadRequestException(
+          `Tenant '${provided}' not found. Please ensure the hostname is registered.`,
+        );
+      }
+
       throw new BadRequestException(
-        `Tenant required. Include the header ${TENANT_HEADER} with a valid hostname.`,
+        `Tenant required. Include the header ${TENANT_HEADER} or query param 'tenant' with a valid hostname.`,
       );
     }
 

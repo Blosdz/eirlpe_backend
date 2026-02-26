@@ -14,6 +14,20 @@ declare global {
   }
 }
 
+/**
+ * Extrae el subdomain de un valor que puede venir como:
+ *   "test"                   → "test"
+ *   "test.localhost"         → "test"
+ *   "test.localhost:3000"    → "test"
+ *   "test.midominio.com"     → "test"
+ */
+function extractSubdomain(raw: string): string {
+  // Quitar puerto si existe
+  const withoutPort = raw.split(':')[0];
+  // Tomar la parte antes del primer punto
+  return withoutPort.split('.')[0].toLowerCase().trim();
+}
+
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
   constructor(
@@ -24,11 +38,15 @@ export class TenantMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const hostname = req.headers[TENANT_HEADER] as string;
+    const raw = (req.headers[TENANT_HEADER] as string) || (req.query.tenant as string);
 
-    if (!hostname) {
+    if (!raw) {
       return next();
     }
+
+    // Normaliza: "test.localhost:3000" → "test", "test.midominio.com" → "test"
+    // Si no tiene punto, se usa tal cual (ya es el subdomain/hostname directo)
+    const hostname = extractSubdomain(raw);
 
     const tenant = await this.tenantService.resolveHostname(hostname);
 

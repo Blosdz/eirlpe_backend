@@ -27,7 +27,13 @@ let TenantGuard = class TenantGuard {
         const request = context.switchToHttp().getRequest();
         const tenant = request.tenant;
         if (!tenant || !tenant.tenantId) {
-            throw new common_1.BadRequestException(`Tenant required. Include the header ${tenant_constants_1.TENANT_HEADER} with a valid hostname.`);
+            const headerValue = request.headers[tenant_constants_1.TENANT_HEADER];
+            const queryValue = request.query.tenant;
+            const provided = (headerValue || queryValue);
+            if (provided) {
+                throw new common_1.BadRequestException(`Tenant '${provided}' not found. Please ensure the hostname is registered.`);
+            }
+            throw new common_1.BadRequestException(`Tenant required. Include the header ${tenant_constants_1.TENANT_HEADER} or query param 'tenant' with a valid hostname.`);
         }
         return true;
     }

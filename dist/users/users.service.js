@@ -24,14 +24,14 @@ let UsersService = class UsersService {
     }
     async findAll() {
         return this.userRepository.find({
-            select: ['id', 'email', 'createdAt', 'updatedAt'],
+            select: ['id', 'email', 'role', 'createdAt', 'updatedAt'],
             order: { createdAt: 'DESC' },
         });
     }
     async findOne(id) {
         const user = await this.userRepository.findOne({
             where: { id },
-            select: ['id', 'email', 'createdAt', 'updatedAt'],
+            select: ['id', 'email', 'role', 'createdAt', 'updatedAt'],
         });
         if (!user) {
             throw new common_1.NotFoundException(`Usuario con ID ${id} no encontrado`);
@@ -41,8 +41,13 @@ let UsersService = class UsersService {
     async findByEmail(email) {
         return this.userRepository.findOne({
             where: { email },
-            select: ['id', 'email', 'password', 'createdAt', 'updatedAt'],
+            select: ['id', 'email', 'password', 'role', 'createdAt', 'updatedAt'],
         });
+    }
+    async update(id, updateUserDto) {
+        const user = await this.findOne(id);
+        Object.assign(user, updateUserDto);
+        return this.userRepository.save(user);
     }
     async remove(id) {
         const user = await this.findOne(id);

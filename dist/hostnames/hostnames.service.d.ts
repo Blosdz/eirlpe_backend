@@ -16,5 +16,6 @@ export declare class HostnamesService {
     }>;
     create(hostname: string, userId?: number): Promise<Hostname>;
     registerWithUser(hostname: string, userId: number): Promise<Hostname>;
+    update(id: number, hostname: string): Promise<Hostname>;
     remove(id: number): Promise<void>;
 }

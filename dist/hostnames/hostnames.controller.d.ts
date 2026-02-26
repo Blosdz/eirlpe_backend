@@ -11,6 +11,9 @@ export declare class HostnamesController {
     create(body: {
         hostname: string;
     }, req: any): Promise<import("../entities").Hostname>;
+    update(id: number, body: {
+        hostname: string;
+    }): Promise<import("../entities").Hostname>;
     remove(id: number): Promise<{
         success: boolean;
         message: string;

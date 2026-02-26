@@ -16,6 +16,7 @@ export declare class AuthService {
         user: {
             id: number;
             email: string;
+            role: string;
             name: string | undefined;
             userProfile: {
                 document: string | undefined;
@@ -32,6 +33,7 @@ export declare class AuthService {
         user: {
             id: number;
             email: string;
+            role: string;
             name: string | undefined;
             userProfile?: undefined;
         };
@@ -42,6 +44,7 @@ export declare class AuthService {
         user: {
             id: number;
             email: string;
+            role: string;
             userProfile: UserProfile | null;
         };
     }>;
