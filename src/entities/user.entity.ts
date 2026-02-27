@@ -10,6 +10,24 @@ export class User {
   @Column({ unique: true, length: 255 })
   email: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  name: string | null;
+
+  @Column({ type: 'varchar', name: 'company_name', length: 255, nullable: true })
+  companyName: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  document: string | null;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phone: string | null;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  address: string | null;
+
+  @Column({ type: 'varchar', name: 'ruc_company', length: 100, nullable: true })
+  rucCompany: string | null;
+
   @Column({ length: 255 })
   password: string;
 

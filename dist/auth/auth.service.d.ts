@@ -45,9 +45,66 @@ export declare class AuthService {
             id: number;
             email: string;
             role: string;
+            name: string | undefined;
             userProfile: UserProfile | null;
         };
     }>;
+    getProfile(userId: number): Promise<{
+        id: number;
+        email: string;
+        name: string | undefined;
+        role: string;
+        profile: {
+            id: number;
+            company_name: string | undefined;
+            document: string | undefined;
+            phone: string | undefined;
+            address: string | undefined;
+            ruc_company: string | undefined;
+            hostname: string;
+        } | {
+            company_name: string | undefined;
+            document: string | undefined;
+            phone: string | undefined;
+            address: string | undefined;
+            ruc_company: string | undefined;
+            id?: undefined;
+            hostname?: undefined;
+        };
+    } | null>;
+    updateProfile(userId: number, dto: {
+        name?: string;
+        email?: string;
+        currentPassword?: string;
+        newPassword?: string;
+        company_name?: string;
+        document?: string;
+        phone?: string;
+        address?: string;
+        ruc_company?: string;
+    }): Promise<{
+        id: number;
+        email: string;
+        name: string | undefined;
+        role: string;
+        profile: {
+            id: number;
+            company_name: string | undefined;
+            document: string | undefined;
+            phone: string | undefined;
+            address: string | undefined;
+            ruc_company: string | undefined;
+            hostname: string;
+        } | {
+            company_name: string | undefined;
+            document: string | undefined;
+            phone: string | undefined;
+            address: string | undefined;
+            ruc_company: string | undefined;
+            id?: undefined;
+            hostname?: undefined;
+        };
+    } | null>;
     getUserHostnames(userId: number): Promise<{
         id: number;
         hostname: string;

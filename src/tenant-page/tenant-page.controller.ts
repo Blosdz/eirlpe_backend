@@ -88,11 +88,31 @@ export class TenantPageController {
 
   // ──────────────────────────────────────────────────────────────────────────
   // GET /api/tenant-page/templates
-  // Lista todos los templates disponibles en el servidor.
+  // Lista todos los templates con metadata (name, description, category) para el selector.
   // ──────────────────────────────────────────────────────────────────────────
   @Get('templates')
   listTemplates() {
-    return { templates: this.renderer.listTemplates() };
+    return { templates: this.renderer.listTemplatesWithMeta() };
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // GET /api/tenant-page/preview/:templateId
+  // Devuelve el HTML del template con valores por defecto para preview (iframe en el selector).
+  // Público, no requiere tenant.
+  // ──────────────────────────────────────────────────────────────────────────
+  @Get('preview/:templateId')
+  previewTemplate(
+    @Param('templateId') templateId: string,
+    @Res() res: express.Response,
+  ) {
+    if (!this.renderer.templateExists(templateId)) {
+      throw new NotFoundException(`Template '${templateId}' no existe`);
+    }
+    const assetBaseUrl = `/api/tenant-page/assets/${templateId}`;
+    const html = this.renderer.renderPreview(templateId, assetBaseUrl);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.send(html);
   }
 
   // ── helper ─────────────────────────────────────────────────────────────────

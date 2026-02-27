@@ -12,10 +12,16 @@ CREATE TABLE hostnames (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Users table
+-- Users table (name y datos de empresa: para perfil y "Mi cuenta" cuando no tiene dominio)
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
+  name VARCHAR(255),
+  company_name VARCHAR(255),
+  document VARCHAR(100),
+  phone VARCHAR(20),
+  address VARCHAR(500),
+  ruc_company VARCHAR(100),
   password VARCHAR(255) NOT NULL,
   role VARCHAR(50) DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

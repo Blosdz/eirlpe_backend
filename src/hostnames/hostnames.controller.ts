@@ -25,9 +25,12 @@ export class HostnamesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() body: { hostname: string }, @Request() req: any) {
+  async create(
+    @Body() body: { hostname: string; templateId?: string },
+    @Request() req: any,
+  ) {
     const userId: number | undefined = req.user?.sub ?? req.user?.id;
-    return this.hostnamesService.create(body.hostname, userId);
+    return this.hostnamesService.create(body.hostname, userId, body.templateId);
   }
 
   @UseGuards(JwtAuthGuard)

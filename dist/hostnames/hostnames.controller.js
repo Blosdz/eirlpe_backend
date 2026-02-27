@@ -32,7 +32,7 @@ let HostnamesController = class HostnamesController {
     }
     async create(body, req) {
         const userId = req.user?.sub ?? req.user?.id;
-        return this.hostnamesService.create(body.hostname, userId);
+        return this.hostnamesService.create(body.hostname, userId, body.templateId);
     }
     async update(id, body) {
         return this.hostnamesService.update(id, body.hostname);

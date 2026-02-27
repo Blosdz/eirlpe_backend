@@ -94,7 +94,17 @@ let TenantPageController = class TenantPageController {
         res.send(content);
     }
     listTemplates() {
-        return { templates: this.renderer.listTemplates() };
+        return { templates: this.renderer.listTemplatesWithMeta() };
+    }
+    previewTemplate(templateId, res) {
+        if (!this.renderer.templateExists(templateId)) {
+            throw new common_1.NotFoundException(`Template '${templateId}' no existe`);
+        }
+        const assetBaseUrl = `/api/tenant-page/assets/${templateId}`;
+        const html = this.renderer.renderPreview(templateId, assetBaseUrl);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=300');
+        res.send(html);
     }
     async getConfig() {
         const connection = this.tenantCtx.getConnection();
@@ -129,6 +139,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], TenantPageController.prototype, "listTemplates", null);
+__decorate([
+    (0, common_1.Get)('preview/:templateId'),
+    __param(0, (0, common_1.Param)('templateId')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], TenantPageController.prototype, "previewTemplate", null);
 exports.TenantPageController = TenantPageController = __decorate([
     (0, common_1.Controller)('tenant-page'),
     __metadata("design:paramtypes", [template_renderer_service_1.TemplateRendererService,

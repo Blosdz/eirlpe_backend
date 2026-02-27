@@ -106,7 +106,17 @@ exports.MARKERS_META = [
 ];
 let TemplateRendererService = TemplateRendererService_1 = class TemplateRendererService {
     logger = new common_1.Logger(TemplateRendererService_1.name);
-    templatesRoot = path.join(process.cwd(), 'page_templates');
+    templatesRoot = this.resolveTemplatesRoot();
+    resolveTemplatesRoot() {
+        const fromCwd = path.join(process.cwd(), 'page_templates');
+        if (fs.existsSync(fromCwd))
+            return fromCwd;
+        const fromBackend = path.join(process.cwd(), 'eirlpe_backend', 'page_templates');
+        if (fs.existsSync(fromBackend))
+            return fromBackend;
+        const fromModule = path.join(__dirname, '..', '..', 'page_templates');
+        return fromModule;
+    }
     render(templateId, customization = {}, assetBaseUrl) {
         const htmlPath = this.resolveAssetPath(templateId, 'index.html');
         let html = fs.readFileSync(htmlPath, 'utf-8');
@@ -142,6 +152,41 @@ let TemplateRendererService = TemplateRendererService_1 = class TemplateRenderer
             .readdirSync(this.templatesRoot, { withFileTypes: true })
             .filter((d) => d.isDirectory())
             .map((d) => d.name);
+    }
+    listTemplatesWithMeta() {
+        const ids = this.listTemplates().filter((id) => this.templateExists(id));
+        return ids.map((id) => {
+            const metaPath = path.join(this.templatesRoot, id, 'metadata.json');
+            let name = id;
+            let description = '';
+            let category = 'General';
+            try {
+                if (fs.existsSync(metaPath)) {
+                    const raw = fs.readFileSync(metaPath, 'utf-8');
+                    const meta = JSON.parse(raw);
+                    if (meta.name)
+                        name = meta.name;
+                    if (meta.description)
+                        description = meta.description;
+                    if (meta.category)
+                        category = meta.category;
+                }
+            }
+            catch {
+            }
+            return { id, name, description, category };
+        });
+    }
+    renderPreview(templateId, assetBaseUrl) {
+        let html = this.render(templateId, {}, assetBaseUrl);
+        const scaleStyle = '<style id="eirlpe-preview-scale">html, body { transform: scale(0.28); transform-origin: 0 0; width: 357%; min-height: 357%; }</style>';
+        if (html.includes('</head>')) {
+            html = html.replace('</head>', `${scaleStyle}</head>`);
+        }
+        else {
+            html = scaleStyle + html;
+        }
+        return html;
     }
     resolveAssetPath(templateId, filename) {
         const safeTemplate = path.basename(templateId);

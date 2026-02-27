@@ -96,8 +96,18 @@ export const MARKERS_META: MarkerMeta[] = [
 export class TemplateRendererService {
   private readonly logger = new Logger(TemplateRendererService.name);
 
-  // Ruta base donde viven los templates (relativa al CWD del proceso)
-  private readonly templatesRoot = path.join(process.cwd(), 'page_templates');
+  // Ruta base: page_templates junto a la raíz del backend (funciona desde eirlpe_backend o desde eirl.pe)
+  private readonly templatesRoot = this.resolveTemplatesRoot();
+
+  private resolveTemplatesRoot(): string {
+    const fromCwd = path.join(process.cwd(), 'page_templates');
+    if (fs.existsSync(fromCwd)) return fromCwd;
+    const fromBackend = path.join(process.cwd(), 'eirlpe_backend', 'page_templates');
+    if (fs.existsSync(fromBackend)) return fromBackend;
+    // Relativo al módulo (dist/tenant-page o src/tenant-page)
+    const fromModule = path.join(__dirname, '..', '..', 'page_templates');
+    return fromModule;
+  }
 
   /**
    * Renderiza el HTML del template con los valores del tenant.
@@ -165,6 +175,48 @@ export class TemplateRendererService {
       .readdirSync(this.templatesRoot, { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => d.name);
+  }
+
+  /**
+   * Lista los templates con metadata (name, description, category) desde metadata.json de cada carpeta.
+   * Solo incluye carpetas que tienen index.html (template válido).
+   */
+  listTemplatesWithMeta(): { id: string; name: string; description: string; category: string }[] {
+    const ids = this.listTemplates().filter((id) => this.templateExists(id));
+    return ids.map((id) => {
+      const metaPath = path.join(this.templatesRoot, id, 'metadata.json');
+      let name = id;
+      let description = '';
+      let category = 'General';
+      try {
+        if (fs.existsSync(metaPath)) {
+          const raw = fs.readFileSync(metaPath, 'utf-8');
+          const meta = JSON.parse(raw) as { name?: string; description?: string; category?: string };
+          if (meta.name) name = meta.name;
+          if (meta.description) description = meta.description;
+          if (meta.category) category = meta.category;
+        }
+      } catch {
+        // mantener defaults
+      }
+      return { id, name, description, category };
+    });
+  }
+
+  /**
+   * Renderiza el HTML del template con valores por defecto (para preview en el selector).
+   * Inyecta un estilo para escalar la página y que se vea completa en un iframe pequeño.
+   */
+  renderPreview(templateId: string, assetBaseUrl: string): string {
+    let html = this.render(templateId, {}, assetBaseUrl);
+    const scaleStyle =
+      '<style id="eirlpe-preview-scale">html, body { transform: scale(0.28); transform-origin: 0 0; width: 357%; min-height: 357%; }</style>';
+    if (html.includes('</head>')) {
+      html = html.replace('</head>', `${scaleStyle}</head>`);
+    } else {
+      html = scaleStyle + html;
+    }
+    return html;
   }
 
   // ── privado ────────────────────────────────────────────────────────────────

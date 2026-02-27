@@ -8,7 +8,13 @@ export declare class TenantPageController {
     renderPage(res: express.Response): Promise<void>;
     serveAsset(templateId: string, filename: string, res: express.Response): void;
     listTemplates(): {
-        templates: string[];
+        templates: {
+            id: string;
+            name: string;
+            description: string;
+            category: string;
+        }[];
     };
+    previewTemplate(templateId: string, res: express.Response): void;
     private getConfig;
 }

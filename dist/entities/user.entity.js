@@ -16,6 +16,12 @@ const available_entity_1 = require("./available.entity");
 let User = class User {
     id;
     email;
+    name;
+    companyName;
+    document;
+    phone;
+    address;
+    rucCompany;
     password;
     role;
     createdAt;
@@ -32,6 +38,30 @@ __decorate([
     (0, typeorm_1.Column)({ unique: true, length: 255 }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 255, nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', name: 'company_name', length: 255, nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "companyName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 100, nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "document", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 20, nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "phone", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 500, nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', name: 'ruc_company', length: 100, nullable: true }),
+    __metadata("design:type", Object)
+], User.prototype, "rucCompany", void 0);
 __decorate([
     (0, typeorm_1.Column)({ length: 255 }),
     __metadata("design:type", String)

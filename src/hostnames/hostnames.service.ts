@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Hostname, UserProfile } from '../entities';
 import { TenantConnectionService } from '../tenant/tenant-connection.service';
+import { TenantConfig } from '../tenant-entities';
 
 @Injectable()
 export class HostnamesService {
@@ -14,7 +15,7 @@ export class HostnamesService {
     @InjectRepository(UserProfile)
     private userProfileRepository: Repository<UserProfile>,
     private tenantConnectionService: TenantConnectionService,
-  ) {}
+  ) { }
 
   async findAll(): Promise<Hostname[]> {
     return this.hostnameRepository.find({
@@ -43,10 +44,14 @@ export class HostnamesService {
   }
 
   /**
-   * Crea el hostname, la BD del tenant y vincula al usuario autenticado
-   * en user_profile. Si userId es null, solo crea el hostname sin vínculo.
+   * Crea el hostname, la BD del tenant, vincula al usuario y
+   * opcionalmente inicializa el TenantConfig con el templateId elegido.
    */
-  async create(hostname: string, userId?: number): Promise<Hostname> {
+  async create(
+    hostname: string,
+    userId?: number,
+    templateId?: string,
+  ): Promise<Hostname> {
     const normalizedHostname = hostname.toLowerCase().trim();
 
     const existing = await this.findByHostname(normalizedHostname);
@@ -69,16 +74,39 @@ export class HostnamesService {
 
     // Vincular el usuario al hostname via user_profile
     if (userId) {
-      const existing = await this.userProfileRepository.findOne({
+      const userProfileExists = await this.userProfileRepository.findOne({
         where: { usersId: userId, hostnameId: savedHostname.id },
       });
-      if (!existing) {
+      if (!userProfileExists) {
         await this.userProfileRepository.save(
           this.userProfileRepository.create({
             usersId: userId,
             hostnameId: savedHostname.id,
           }),
         );
+      }
+    }
+
+    // Crear configuración inicial del tenant si se proporcionó un templateId
+    if (templateId) {
+      try {
+        const tenantConnection = await this.tenantConnectionService.getConnection(normalizedHostname);
+        const configRepo = tenantConnection.getRepository(TenantConfig);
+        const alreadyExists = await configRepo.findOne({ where: { isActive: true } });
+        if (!alreadyExists) {
+          await configRepo.save(
+            configRepo.create({
+              templateId,
+              businessName: undefined as any,
+              customization: {},
+              isActive: true,
+            }),
+          );
+          this.logger.log(`TenantConfig inicial creada para ${normalizedHostname} con template: ${templateId}`);
+        }
+      } catch (error) {
+        // No bloquear el registro si falla la config inicial — se puede configurar después
+        this.logger.warn(`No se pudo crear TenantConfig para ${normalizedHostname}: ${error.message}`);
       }
     }
 

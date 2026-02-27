@@ -10,6 +10,7 @@ export declare class HostnamesController {
     findOne(id: number): Promise<import("../entities").Hostname>;
     create(body: {
         hostname: string;
+        templateId?: string;
     }, req: any): Promise<import("../entities").Hostname>;
     update(id: number, body: {
         hostname: string;

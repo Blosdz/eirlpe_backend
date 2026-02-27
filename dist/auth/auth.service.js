@@ -74,7 +74,11 @@ let AuthService = class AuthService {
             throw new common_1.BadRequestException('El email ya está registrado');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = this.userRepository.create({ email, password: hashedPassword });
+        const newUser = this.userRepository.create({
+            email,
+            password: hashedPassword,
+            name: name?.trim() || null,
+        });
         const savedUser = await this.userRepository.save(newUser);
         if (userProfile?.hostname_id) {
             const hostnameValue = userProfile.hostname_id.toLowerCase().trim();
@@ -107,7 +111,7 @@ let AuthService = class AuthService {
                     id: savedUser.id,
                     email: savedUser.email,
                     role: savedUser.role || 'user',
-                    name,
+                    name: savedUser.name ?? name ?? undefined,
                     userProfile: {
                         document: userProfile.document,
                         phone: userProfile.phone,
@@ -169,9 +173,113 @@ let AuthService = class AuthService {
                 id: user.id,
                 email: user.email,
                 role: user.role,
+                name: user.name ?? undefined,
                 userProfile: userProfile,
             },
         };
+    }
+    async getProfile(userId) {
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            select: ['id', 'email', 'name', 'role', 'companyName', 'document', 'phone', 'address', 'rucCompany'],
+        });
+        if (!user)
+            return null;
+        const firstProfile = await this.userProfileRepository.findOne({
+            where: { usersId: userId },
+            relations: ['hostname'],
+            order: { id: 'ASC' },
+        });
+        const profilePayload = firstProfile
+            ? {
+                id: firstProfile.id,
+                company_name: firstProfile.companyName ?? undefined,
+                document: firstProfile.document ?? undefined,
+                phone: firstProfile.phone ?? undefined,
+                address: firstProfile.address ?? undefined,
+                ruc_company: firstProfile.rucCompany ?? undefined,
+                hostname: firstProfile.hostname?.hostname ?? undefined,
+            }
+            : {
+                company_name: user.companyName ?? undefined,
+                document: user.document ?? undefined,
+                phone: user.phone ?? undefined,
+                address: user.address ?? undefined,
+                ruc_company: user.rucCompany ?? undefined,
+            };
+        return {
+            id: user.id,
+            email: user.email,
+            name: user.name ?? undefined,
+            role: user.role,
+            profile: profilePayload,
+        };
+    }
+    async updateProfile(userId, dto) {
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            select: ['id', 'email', 'name', 'password', 'role', 'companyName', 'document', 'phone', 'address', 'rucCompany'],
+        });
+        if (!user)
+            throw new common_1.UnauthorizedException('Usuario no encontrado');
+        if (dto.name !== undefined) {
+            user.name = dto.name?.trim() || null;
+        }
+        if (dto.email !== undefined) {
+            const email = dto.email.trim().toLowerCase();
+            if (!email)
+                throw new common_1.BadRequestException('El email no puede estar vacío');
+            const existing = await this.userRepository.findOne({ where: { email } });
+            if (existing && existing.id !== userId) {
+                throw new common_1.BadRequestException('El email ya está en uso');
+            }
+            user.email = email;
+        }
+        if (dto.newPassword) {
+            if (!dto.currentPassword) {
+                throw new common_1.BadRequestException('La contraseña actual es requerida para cambiar la contraseña');
+            }
+            const match = await bcrypt.compare(dto.currentPassword, user.password);
+            if (!match) {
+                throw new common_1.BadRequestException('La contraseña actual no es correcta');
+            }
+            user.password = await bcrypt.hash(dto.newPassword, 10);
+        }
+        const profileFields = ['company_name', 'document', 'phone', 'address', 'ruc_company'];
+        const hasProfileUpdate = profileFields.some((f) => dto[f] !== undefined);
+        if (hasProfileUpdate) {
+            const profile = await this.userProfileRepository.findOne({
+                where: { usersId: userId },
+                order: { id: 'ASC' },
+            });
+            if (profile) {
+                if (dto.company_name !== undefined)
+                    profile.companyName = dto.company_name?.trim() || undefined;
+                if (dto.document !== undefined)
+                    profile.document = dto.document?.trim() || undefined;
+                if (dto.phone !== undefined)
+                    profile.phone = dto.phone?.trim() || undefined;
+                if (dto.address !== undefined)
+                    profile.address = dto.address?.trim() || undefined;
+                if (dto.ruc_company !== undefined)
+                    profile.rucCompany = dto.ruc_company?.trim() || undefined;
+                await this.userProfileRepository.save(profile);
+            }
+            else {
+                if (dto.company_name !== undefined)
+                    user.companyName = dto.company_name?.trim() || null;
+                if (dto.document !== undefined)
+                    user.document = dto.document?.trim() || null;
+                if (dto.phone !== undefined)
+                    user.phone = dto.phone?.trim() || null;
+                if (dto.address !== undefined)
+                    user.address = dto.address?.trim() || null;
+                if (dto.ruc_company !== undefined)
+                    user.rucCompany = dto.ruc_company?.trim() || null;
+            }
+        }
+        await this.userRepository.save(user);
+        return this.getProfile(userId);
     }
     async getUserHostnames(userId) {
         const profiles = await this.userProfileRepository.find({

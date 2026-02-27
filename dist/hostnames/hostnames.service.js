@@ -19,6 +19,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const entities_1 = require("../entities");
 const tenant_connection_service_1 = require("../tenant/tenant-connection.service");
+const tenant_entities_1 = require("../tenant-entities");
 let HostnamesService = HostnamesService_1 = class HostnamesService {
     hostnameRepository;
     userProfileRepository;
@@ -51,7 +52,7 @@ let HostnamesService = HostnamesService_1 = class HostnamesService {
             hostname: hostname.toLowerCase(),
         };
     }
-    async create(hostname, userId) {
+    async create(hostname, userId, templateId) {
         const normalizedHostname = hostname.toLowerCase().trim();
         const existing = await this.findByHostname(normalizedHostname);
         if (existing) {
@@ -68,14 +69,33 @@ let HostnamesService = HostnamesService_1 = class HostnamesService {
             throw new common_1.BadRequestException('Failed to create tenant database');
         }
         if (userId) {
-            const existing = await this.userProfileRepository.findOne({
+            const userProfileExists = await this.userProfileRepository.findOne({
                 where: { usersId: userId, hostnameId: savedHostname.id },
             });
-            if (!existing) {
+            if (!userProfileExists) {
                 await this.userProfileRepository.save(this.userProfileRepository.create({
                     usersId: userId,
                     hostnameId: savedHostname.id,
                 }));
+            }
+        }
+        if (templateId) {
+            try {
+                const tenantConnection = await this.tenantConnectionService.getConnection(normalizedHostname);
+                const configRepo = tenantConnection.getRepository(tenant_entities_1.TenantConfig);
+                const alreadyExists = await configRepo.findOne({ where: { isActive: true } });
+                if (!alreadyExists) {
+                    await configRepo.save(configRepo.create({
+                        templateId,
+                        businessName: undefined,
+                        customization: {},
+                        isActive: true,
+                    }));
+                    this.logger.log(`TenantConfig inicial creada para ${normalizedHostname} con template: ${templateId}`);
+                }
+            }
+            catch (error) {
+                this.logger.warn(`No se pudo crear TenantConfig para ${normalizedHostname}: ${error.message}`);
             }
         }
         return savedHostname;
